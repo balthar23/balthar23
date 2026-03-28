@@ -1,0 +1,43 @@
+name: Publish Golf Post
+
+on:
+  push:
+    paths:
+      - 'pending-posts/**.json'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Find and publish new post
+        env:
+          FAIRWAY_API_KEY: ${{ secrets.FAIRWAY_API_KEY }}
+        run: |
+          # Find the most recently added JSON file in pending-posts/
+          POST_FILE=$(git diff-tree --no-commit-id -r --name-only ${{ github.sha }} | grep 'pending-posts/.*\.json' | head -1)
+          
+          if [ -z "$POST_FILE" ]; then
+            echo "No post file found in this commit"
+            exit 0
+          fi
+          
+          echo "Publishing: $POST_FILE"
+          
+          # POST it to the API
+          RESPONSE=$(curl -s -X POST https://midhandicap.com/api.php/posts \
+            -H "Content-Type: application/json" \
+            -H "X-API-Key: $FAIRWAY_API_KEY" \
+            -d @"$POST_FILE")
+          
+          echo "API response: $RESPONSE"
+          
+          # Check for success
+          if echo "$RESPONSE" | grep -q '"success":true'; then
+            echo "✅ Post published successfully"
+          else
+            echo "❌ Publish failed"
+            exit 1
+          fi
