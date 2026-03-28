@@ -16,15 +16,16 @@ jobs:
         env:
           FAIRWAY_API_KEY: ${{ secrets.FAIRWAY_API_KEY }}
         run: |
-          # Find the most recently added JSON file in pending-posts/
-          POST_FILE=$(git diff-tree --no-commit-id -r --name-only ${{ github.sha }} | grep 'pending-posts/.*\.json' | head -1)
+          # Find the most recently modified JSON file in pending-posts/
+          POST_FILE=$(ls -t pending-posts/*.json 2>/dev/null | head -1)
           
           if [ -z "$POST_FILE" ]; then
-            echo "No post file found in this commit"
+            echo "No post files found in pending-posts/"
             exit 0
           fi
           
           echo "Publishing: $POST_FILE"
+          cat "$POST_FILE"
           
           # POST it to the API
           RESPONSE=$(curl -s -X POST https://midhandicap.com/api.php/posts \
