@@ -65,6 +65,12 @@ async function groqComplete(prompt) {
   return parsed.choices[0].message.content;
 }
 
+function extractField(fieldName, str) {
+  const re = new RegExp('"' + fieldName + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"');
+  const m = str.match(re);
+  return m ? m[1] : null;
+}
+
 async function main() {
   const now = new Date();
   const months = ['January','February','March','April','May','June',
@@ -113,6 +119,7 @@ async function main() {
 
   console.log('Generating post with Groq...');
 
+  // Ask Groq to return each field separately to avoid JSON escaping issues
   const prompt = [
     'You are a golf journalist writing for midhandicap.com, a blog for mid-handicap amateur golfers.',
     'Based on the following research, write a golf news post. TODAY IS ' + month + ' ' + year + '.',
@@ -123,39 +130,70 @@ async function main() {
     'FULL ARTICLE CONTENT:',
     articleContent,
     '',
-    'Write a complete post and return ONLY valid JSON (no markdown, no code fences) in exactly this format:',
+    'Return your response as valid JSON with these exact fields:',
     '{',
     '  "title": "Compelling headline max 70 chars",',
     '  "category": "Tour News",',
     '  "date": "' + month + ' ' + year + '",',
     '  "excerpt": "1-2 sentence teaser max 200 chars",',
-    '  "body": "<h2>Section heading</h2><p>Body text.</p>"',
+    '  "body": "HTML content here"',
     '}',
     '',
-    'Rules for the body field:',
-    '- Use only these HTML tags: h2, h3, p, blockquote, div',
-    '- Allowed div classes: stats-bar, stat-item, stat-label, stat-value, gold-bar, pill, card-section',
-    '- Start with a h2 section heading (NOT the title)',
-    '- Include 3-5 sections with h2 headings',
-    '- Always include a stats-bar div with 2-4 real stats from the research',
-    '- 350-500 words total',
-    '- Tone: authoritative, punchy, British-inflected golf journalism',
-    '- No placeholder text, every sentence must be real and factual',
-    '- category must be one of: Tour News, Equipment & More, Player Focus, Course Guide, Instruction',
-    '- In the JSON body value, escape all forward slashes as \\/ and all double quotes as \\"',
+    'For the body field write HTML using only: h2, h3, p, blockquote, div tags.',
+    'Allowed div classes: stats-bar, stat-item, stat-label, stat-value, gold-bar, pill, card-section.',
+    'Start with a h2 section heading. Include 3-5 sections. Include a stats-bar div with 2-4 real stats.',
+    '350-500 words. Tone: authoritative punchy British golf journalism. No placeholder text.',
+    'category must be one of: Tour News, Equipment & More, Player Focus, Course Guide, Instruction.',
     '',
-    'Return ONLY the JSON object. No preamble. No explanation.'
+    'CRITICAL JSON RULES:',
+    '- Use straight double quotes only',
+    '- In the body string value: replace all " with \\" and all \\ with \\\\',
+    '- Do NOT use single quotes anywhere in the JSON',
+    '- Do NOT include newlines inside string values - use spaces instead',
+    '- Return ONLY the JSON object, nothing else'
   ].join('\n');
 
   const raw = await groqComplete(prompt);
+  console.log('Raw Groq response length:', raw.length);
 
   let postData;
+
+  // attempt 1: direct parse after stripping fences
   try {
-    const cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/, '').trim();
+    let cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/, '').trim();
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (jsonMatch) cleaned = jsonMatch[0];
     postData = JSON.parse(cleaned);
-  } catch (e) {
-    console.error('JSON parse failed. Raw output:', raw);
-    throw new Error('Groq returned invalid JSON: ' + e.message);
+    console.log('JSON parsed successfully on first attempt');
+  } catch (e1) {
+    console.warn('Direct parse failed:', e1.message);
+
+    // attempt 2: extract fields individually
+    try {
+      console.log('Attempting field extraction fallback...');
+      let cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/, '').trim();
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      if (jsonMatch) cleaned = jsonMatch[0];
+
+      const title    = extractField('title', cleaned);
+      const category = extractField('category', cleaned);
+      const date     = extractField('date', cleaned);
+      const excerpt  = extractField('excerpt', cleaned);
+
+      // extract body - everything between "body": " and the final "}
+      const bodyMatch = cleaned.match(/"body"\s*:\s*"([\s\S]+?)"\s*\}?\s*$/);
+      const body = bodyMatch ? bodyMatch[1] : null;
+
+      if (!title || !category || !date || !excerpt || !body) {
+        throw new Error('Missing fields after extraction. title=' + title + ' category=' + category);
+      }
+
+      postData = { title, category, date, excerpt, body };
+      console.log('Field extraction succeeded');
+    } catch (e2) {
+      console.error('All parse attempts failed. Raw output:', raw);
+      throw new Error('Could not parse Groq response: ' + e2.message);
+    }
   }
 
   const timestamp = Date.now();
@@ -175,30 +213,6 @@ async function main() {
   console.log('Title:', postData.title);
   console.log('Category:', postData.category);
   console.log('Date:', postData.date);
-
-  // Publish directly to the API if key is available
-  if (process.env.FAIRWAY_API_KEY) {
-    console.log('Publishing post to API...');
-    const body = JSON.stringify(postData);
-    const res = await httpsRequest(
-      'https://midhandicap.com/api.php/posts',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': process.env.FAIRWAY_API_KEY,
-          'Content-Length': Buffer.byteLength(body)
-        }
-      },
-      body
-    );
-    console.log('API response:', res.body);
-    if (res.body.includes('"success":true')) {
-      console.log('✅ Post published successfully');
-    } else {
-      console.warn('⚠️  API publish may have failed — check response above');
-    }
-  }
 }
 
 main().catch(err => {
