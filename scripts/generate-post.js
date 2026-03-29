@@ -92,126 +92,169 @@ const fallbackImages = [
   'https://images.pexels.com/photos/6542947/pexels-photo-6542947.jpeg'
 ];
 
-// Article types rotate by day of week
-// Mon=Tour News, Tue=Instruction, Wed=Equipment, Thu=Player Focus, Fri=Tour News, Sat=Instruction, Sun=Equipment
-const articleTypes = [
-  {
-    // Monday
-    category: 'Tour News',
-    imageQuery: 'golf tournament trophy',
-    searches: [
-      'PGA Tour latest results {month} {year}',
-      'DP World Tour news {month} {year}',
-      'LIV Golf latest {month} {year}'
-    ],
-    instructions: [
-      'Write a tour news roundup covering the latest results and standings from professional golf.',
-      'Include scores, leaderboard positions and any notable performances.',
-      'Include a stats-bar with 2-4 real scores or stats from the research.',
-      'Tone: authoritative, punchy, British golf journalism.'
-    ]
-  },
-  {
-    // Tuesday
-    category: 'Instruction',
-    imageQuery: 'golf swing instruction lesson',
-    searches: [
-      'golf tips mid handicap improvement {year}',
-      'golf swing tips for club golfers {year}',
-      'how to improve golf iron play {year}'
-    ],
-    instructions: [
-      'Write a practical golf instruction article aimed at mid-handicap amateur golfers (10-20 handicap).',
-      'Focus on a specific skill: e.g. iron play, chipping, bunker shots, putting, course management, or the mental game.',
-      'Include actionable tips and drills the reader can take to the course or practice range.',
-      'Include a stats-bar with 2-4 interesting facts or improvement statistics.',
-      'Tone: coaching, encouraging, practical.'
-    ]
-  },
-  {
-    // Wednesday
-    category: 'Equipment & More',
-    imageQuery: 'golf equipment',
-    searches: [
-      'best new golf clubs {year} review',
-      'new golf driver release {year}',
-      'golf equipment review {month} {year}'
-    ],
-    instructions: [
-      'Write a golf equipment review or roundup article.',
-      'Cover new club releases, technology innovations, or a "best of" style comparison.',
-      'Include specs, key features and who the equipment suits.',
-      'Include a stats-bar with 2-4 specs or performance stats.',
-      'Tone: informed, enthusiastic, practical buying advice.'
-    ]
-  },
-  {
-    // Thursday
-    category: 'Player Focus',
-    imageQuery: 'professional golfer',
-    searches: [
-      'PGA Tour player spotlight {month} {year}',
-      'rising star professional golf {year}',
-      'golf player profile form {month} {year}'
-    ],
-    instructions: [
-      'Write a player profile or focus piece on a professional golfer who is currently in form or in the news.',
-      'Cover their recent results, playing style, career highlights and what makes them interesting.',
-      'Include a stats-bar with 2-4 career or current season stats.',
-      'Tone: engaging, insightful, fan-friendly.'
-    ]
-  },
-  {
-    // Friday
-    category: 'Tour News',
-    imageQuery: 'golf course green flag',
-    searches: [
-      'PGA Tour weekend preview {month} {year}',
-      'golf tournament this weekend {month} {year}',
-      'DP World Tour upcoming event {month} {year}'
-    ],
-    instructions: [
-      'Write a weekend tournament preview covering what is coming up in professional golf.',
-      'Cover the venue, key contenders, recent form and what to watch out for.',
-      'Include a stats-bar with 2-4 relevant stats about the tournament or course.',
-      'Tone: preview, build anticipation, British golf journalism.'
-    ]
-  },
-  {
-    // Saturday
-    category: 'Instruction',
-    imageQuery: 'golf practice',
-    searches: [
-      'golf course management tips {year}',
-      'golf mental game tips amateur {year}',
-      'golf short game improvement tips {year}'
-    ],
-    instructions: [
-      'Write a practical golf tips article for mid-handicap golfers focused on scoring better.',
-      'Topics could include: course management, reading greens, pre-shot routine, playing in wind, or avoiding big numbers.',
-      'Include actionable advice the reader can use in their next round.',
-      'Include a stats-bar with 2-4 facts or statistics about the topic.',
-      'Tone: friendly, practical, encouraging.'
-    ]
-  },
-  {
-    // Sunday
-    category: 'Equipment & More',
-    imageQuery: 'golf equipment',
-    searches: [
-      'golf accessories review {year}',
-      'best golf balls mid handicap {year}',
-      'golf technology gadgets {year}'
-    ],
-    instructions: [
-      'Write an equipment or accessories article focused on golf gear that helps mid-handicap golfers.',
-      'Could cover: golf balls, rangefinders, GPS watches, training aids, bags, shoes or apparel.',
-      'Give practical buying advice and recommendations.',
-      'Include a stats-bar with 2-4 specs or value comparisons.',
-      'Tone: helpful, practical, honest buying guide.'
-    ]
-  }
-];
+// 14 article types — morning and evening for each day
+// morning[0]=Mon AM, morning[1]=Tue AM ... morning[6]=Sun AM
+// evening[0]=Mon PM, evening[1]=Tue PM ... evening[6]=Sun PM
+const schedule = {
+  morning: [
+    {
+      // Monday AM
+      category: 'Tour News',
+      imageQuery: 'golf tournament trophy winners',
+      searches: [
+        'PGA Tour latest results {month} {year}',
+        'DP World Tour news {month} {year}',
+        'LIV Golf latest {month} {year}'
+      ],
+      instructions: 'Write a tour news roundup covering the latest results and standings from professional golf. Include scores, leaderboard positions and notable performances. Include a stats-bar with 2-4 real scores or stats. Tone: authoritative, punchy, British golf journalism.'
+    },
+    {
+      // Tuesday AM
+      category: 'Instruction',
+      imageQuery: 'golf swing instruction lesson driving range',
+      searches: [
+        'golf swing tips mid handicap {year}',
+        'how to improve golf iron play {year}',
+        'golf driving tips amateur {year}'
+      ],
+      instructions: 'Write a practical golf instruction article for mid-handicap golfers (10-20 handicap). Focus on full swing technique — driving, iron play or fairway woods. Include step-by-step tips and drills. Include a stats-bar with 2-4 interesting improvement stats. Tone: coaching, encouraging, practical.'
+    },
+    {
+      // Wednesday AM
+      category: 'Equipment & More',
+      imageQuery: 'golf driver club new technology',
+      searches: [
+        'best new golf driver {year} review',
+        'new golf clubs release {year}',
+        'golf equipment review {month} {year}'
+      ],
+      instructions: 'Write a golf equipment review or roundup covering the latest driver or iron releases. Include specs, key technology features, who each club suits and value for money. Include a stats-bar with 2-4 specs or performance stats. Tone: informed, enthusiastic, practical buying advice.'
+    },
+    {
+      // Thursday AM
+      category: 'Player Focus',
+      imageQuery: 'professional golfer swing action shot',
+      searches: [
+        'PGA Tour player in form {month} {year}',
+        'best golfer world rankings {month} {year}',
+        'golf player profile {month} {year}'
+      ],
+      instructions: 'Write a player profile on a professional golfer currently in form or making headlines. Cover their recent results, playing style, career highlights and what makes them worth watching. Include a stats-bar with 2-4 career or current season stats. Tone: engaging, insightful, fan-friendly.'
+    },
+    {
+      // Friday AM
+      category: 'Tour News',
+      imageQuery: 'golf course fairway aerial view',
+      searches: [
+        'PGA Tour weekend preview {month} {year}',
+        'golf tournament this weekend {month} {year}',
+        'DP World Tour upcoming {month} {year}'
+      ],
+      instructions: 'Write a weekend tournament preview. Cover the venue, course details, key contenders, recent form and what to watch out for. Include a stats-bar with 2-4 relevant course or tournament stats. Tone: preview, build anticipation, British golf journalism.'
+    },
+    {
+      // Saturday AM
+      category: 'Instruction',
+      imageQuery: 'golf short game chipping bunker',
+      searches: [
+        'golf short game tips improvement {year}',
+        'golf chipping tips amateur {year}',
+        'bunker play golf tips {year}'
+      ],
+      instructions: 'Write a practical short game instruction article for mid-handicap golfers. Focus on chipping, pitching, bunker play or putting. Include step-by-step tips and on-course drills. Include a stats-bar with 2-4 stats about scoring or short game. Tone: friendly, practical, encouraging.'
+    },
+    {
+      // Sunday AM
+      category: 'Equipment & More',
+      imageQuery: 'golf balls selection comparison',
+      searches: [
+        'best golf balls mid handicap {year}',
+        'golf ball review comparison {year}',
+        'golf ball distance spin {year}'
+      ],
+      instructions: 'Write a golf ball review or comparison article aimed at mid-handicap golfers. Compare distance, spin, feel and price across popular models. Give clear recommendations for different types of players. Include a stats-bar with 2-4 specs or performance comparisons. Tone: helpful, practical, honest.'
+    }
+  ],
+  evening: [
+    {
+      // Monday PM
+      category: 'Course Guide',
+      imageQuery: 'famous golf course landscape scenic',
+      searches: [
+        'famous golf courses world top ranked {year}',
+        'bucket list golf courses {year}',
+        'best golf courses to play {year}'
+      ],
+      instructions: 'Write a course guide or feature on a famous or bucket-list golf course. Cover the history, signature holes, challenges and what makes it special. Include a stats-bar with 2-4 course facts like par, yardage, notable records. Tone: evocative, descriptive, inspiring.'
+    },
+    {
+      // Tuesday PM
+      category: 'Equipment & More',
+      imageQuery: 'golf accessories rangefinder GPS watch',
+      searches: [
+        'best golf rangefinder {year} review',
+        'golf GPS watch review {year}',
+        'golf technology accessories {year}'
+      ],
+      instructions: 'Write an equipment review covering golf technology accessories — rangefinders, GPS watches, launch monitors or training aids. Include key features, accuracy, battery life and value. Include a stats-bar with 2-4 specs or comparisons. Tone: tech-savvy, practical, helpful.'
+    },
+    {
+      // Wednesday PM
+      category: 'Instruction',
+      imageQuery: 'golf putting green practice stroke',
+      searches: [
+        'golf putting tips improvement {year}',
+        'how to putt better amateur golf {year}',
+        'golf green reading tips {year}'
+      ],
+      instructions: 'Write a putting instruction article for mid-handicap golfers. Cover stroke technique, green reading, distance control or pre-putt routine. Include practical drills. Include a stats-bar with 2-4 stats about putting averages or improvement. Tone: coaching, focused, practical.'
+    },
+    {
+      // Thursday PM
+      category: 'Tour News',
+      imageQuery: 'golf leaderboard scoreboard tournament',
+      searches: [
+        'LIV Golf news results {month} {year}',
+        'DP World Tour leaderboard {month} {year}',
+        'golf tour standings rankings {month} {year}'
+      ],
+      instructions: 'Write a tour news update covering LIV Golf and DP World Tour results and standings. Include leaderboard positions, notable performances and what is at stake going forward. Include a stats-bar with 2-4 real scores or standings stats. Tone: authoritative, informative, British golf journalism.'
+    },
+    {
+      // Friday PM
+      category: 'Player Focus',
+      imageQuery: 'golfer celebrating winning putt',
+      searches: [
+        'golf rising star young player {year}',
+        'best young golfer tour {month} {year}',
+        'golf player to watch {year}'
+      ],
+      instructions: 'Write a player focus piece on a rising star or young professional golfer making their mark on tour. Cover their background, recent breakthrough performances and potential for the future. Include a stats-bar with 2-4 career stats. Tone: enthusiastic, inspiring, fan-friendly.'
+    },
+    {
+      // Saturday PM
+      category: 'Instruction',
+      imageQuery: 'golf course management strategy',
+      searches: [
+        'golf course management tips scoring {year}',
+        'golf mental game strategy {year}',
+        'how to score better golf round {year}'
+      ],
+      instructions: 'Write a course management and strategy article for mid-handicap golfers. Cover topics like when to lay up, club selection, playing to your strengths, avoiding big numbers or the mental side of the game. Include a stats-bar with 2-4 relevant scoring stats. Tone: strategic, insightful, practical.'
+    },
+    {
+      // Sunday PM
+      category: 'Tour News',
+      imageQuery: 'golf tournament Sunday final round',
+      searches: [
+        'PGA Tour results this week {month} {year}',
+        'golf tournament winner {month} {year}',
+        'golf weekend results roundup {month} {year}'
+      ],
+      instructions: 'Write a Sunday results roundup covering the weekend tournament outcomes from professional golf. Cover the winner, key moments, final leaderboard and any storylines that emerged. Include a stats-bar with 2-4 real scores or stats. Tone: authoritative, recap style, British golf journalism.'
+    }
+  ]
+};
 
 function extractField(fieldName, str) {
   const re = new RegExp('"' + fieldName + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"');
@@ -225,15 +268,19 @@ async function main() {
                   'July','August','September','October','November','December'];
   const month = months[now.getMonth()];
   const year = now.getFullYear();
-  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon ... 6=Sat
+  const hour = now.getUTCHours(); // workflow passes UTC hour
 
-  // Map day of week to article type (0=Sun uses index 6, 1=Mon uses index 0, etc.)
-  const typeIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-  const articleType = articleTypes[typeIndex];
+  // Map day: 0=Sun->6, 1=Mon->0, 2=Tue->1 etc
+  const dayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
 
-  console.log('Day of week:', dayOfWeek, '- Article type:', articleType.category);
+  // 21:00 UTC = 7am Melbourne (AEDT), 08:00 UTC = 6pm Melbourne (AEDT)
+  const isMorning = hour >= 18 && hour < 22; // catches 21:00 UTC
+  const slot = isMorning ? 'morning' : 'evening';
+  const articleType = schedule[slot][dayIndex];
 
-  // Build search queries for today's type
+  console.log('Day index:', dayIndex, '| Slot:', slot, '| Category:', articleType.category);
+
   const queries = articleType.searches.map(q =>
     q.replace('{month}', month).replace('{year}', year)
   );
@@ -266,7 +313,6 @@ async function main() {
     }
   }
 
-  // Get hero image
   let heroImg = null;
   if (process.env.PEXELS_API_KEY) {
     heroImg = await getPexelsImage(articleType.imageQuery);
@@ -284,10 +330,10 @@ async function main() {
     'You are a golf writer for midhandicap.com, a blog for mid-handicap amateur golfers.',
     'TODAY IS ' + month + ' ' + year + '.',
     '',
-    'ARTICLE TYPE FOR TODAY: ' + articleType.category,
+    'ARTICLE TYPE: ' + articleType.category,
     '',
     'WRITING INSTRUCTIONS:',
-    articleType.instructions.join(' '),
+    articleType.instructions,
     '',
     'RESEARCH:',
     searchSummary,
@@ -306,7 +352,7 @@ async function main() {
     '',
     'For the body field write HTML using only: h2, h3, p, blockquote, div tags.',
     'Allowed div classes: stats-bar, stat-item, stat-label, stat-value, gold-bar, pill, card-section.',
-    'Start with a h2 section heading. Include 3-5 sections. Include a stats-bar div with 2-4 real stats.',
+    'Start with a h2 section heading. Include 4-6 sections with h2 headings. Include a stats-bar div with 2-4 real stats.',
     '900-1100 words. No placeholder text.',
     '',
     'CRITICAL JSON RULES:',
