@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  generate-post:
+  generate-and-publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,21 +25,36 @@ jobs:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: node scripts/generate-post.js
 
-      - name: Commit post to repository
+      - name: Publish post to midhandicap.com
+        env:
+          FAIRWAY_API_KEY: ${{ secrets.FAIRWAY_API_KEY }}
+        run: |
+          POST_FILE=$(ls -t pending-posts/*.json 2>/dev/null | head -1)
+          if [ -z "$POST_FILE" ]; then
+            echo "No post file found"
+            exit 1
+          fi
+          echo "Publishing: $POST_FILE"
+          cat "$POST_FILE"
+          RESPONSE=$(curl -s -X POST https://midhandicap.com/api.php/posts \
+            -H "Content-Type: application/json" \
+            -H "X-API-Key: $FAIRWAY_API_KEY" \
+            -d @"$POST_FILE")
+          echo "API response: $RESPONSE"
+          if echo "$RESPONSE" | grep -q '"success":true'; then
+            echo "✅ Post published successfully"
+            echo "POST_FILE=$POST_FILE" >> $GITHUB_ENV
+          else
+            echo "❌ Publish failed"
+            exit 1
+          fi
+
+      - name: Commit and clean up
         run: |
           git config user.name "golf-bot"
           git config user.email "golf-bot@midhandicap.com"
           git remote set-url origin https://balthar23:${{ secrets.GH_PAT }}@github.com/balthar23/balthar23.git
-          git add pending-posts/
-          git diff --cached --quiet || git commit -m "Add golf post: $(date +'%Y-%m-%d')"
+          git rm "$POST_FILE"
+          git commit -m "Published and cleaned up post [skip ci]"
           git push
-
-      - name: Trigger publish workflow
-        run: |
-          sleep 10
-          curl -s -X POST \
-            -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/balthar23/balthar23/actions/workflows/publish-golf-post.yml/dispatches \
-            -d '{"ref":"main"}'
-          echo "Publish workflow triggered"
+          echo "🗑️ Cleaned up $POST_FILE"
