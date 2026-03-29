@@ -53,10 +53,5 @@ jobs:
             exit 1
           fi
 
-          git config user.name "golf-bot"
-          git config user.email "golf-bot@midhandicap.com"
-          git remote set-url origin https://balthar23:${GH_PAT}@github.com/balthar23/balthar23.git
-          git rm "$POST_FILE"
-          git commit -m "Published and cleaned up post [skip ci]"
-          git push
+          rm "$POST_FILE"
           echo "🗑️ Cleaned up $POST_FILE"
