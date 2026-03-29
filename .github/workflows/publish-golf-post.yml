@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'pending-posts/**.json'
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -17,22 +18,17 @@ jobs:
           FAIRWAY_API_KEY: ${{ secrets.FAIRWAY_API_KEY }}
         run: |
           POST_FILE=$(ls -t pending-posts/*.json 2>/dev/null | head -1)
-
           if [ -z "$POST_FILE" ]; then
             echo "No post files found in pending-posts/"
             exit 0
           fi
-
           echo "Publishing: $POST_FILE"
           cat "$POST_FILE"
-
           RESPONSE=$(curl -s -X POST https://midhandicap.com/api.php/posts \
             -H "Content-Type: application/json" \
             -H "X-API-Key: $FAIRWAY_API_KEY" \
             -d @"$POST_FILE")
-
           echo "API response: $RESPONSE"
-
           if echo "$RESPONSE" | grep -q '"success":true'; then
             echo "✅ Post published successfully"
             echo "POST_FILE=$POST_FILE" >> $GITHUB_ENV
