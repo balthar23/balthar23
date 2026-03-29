@@ -175,6 +175,30 @@ async function main() {
   console.log('Title:', postData.title);
   console.log('Category:', postData.category);
   console.log('Date:', postData.date);
+
+  // Publish directly to the API if key is available
+  if (process.env.FAIRWAY_API_KEY) {
+    console.log('Publishing post to API...');
+    const body = JSON.stringify(postData);
+    const res = await httpsRequest(
+      'https://midhandicap.com/api.php/posts',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': process.env.FAIRWAY_API_KEY,
+          'Content-Length': Buffer.byteLength(body)
+        }
+      },
+      body
+    );
+    console.log('API response:', res.body);
+    if (res.body.includes('"success":true')) {
+      console.log('✅ Post published successfully');
+    } else {
+      console.warn('⚠️  API publish may have failed — check response above');
+    }
+  }
 }
 
 main().catch(err => {
