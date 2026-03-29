@@ -46,7 +46,7 @@ async function jinaFetch(url) {
 async function groqComplete(prompt) {
   const body = JSON.stringify({
     model: 'llama-3.3-70b-versatile',
-    max_tokens: 3000,
+    max_tokens: 4000,
     messages: [{ role: 'user', content: prompt }]
   });
   const res = await httpsRequest(
@@ -352,8 +352,16 @@ async function main() {
     '',
     'For the body field write HTML using only: h2, h3, p, blockquote, div tags.',
     'Allowed div classes: stats-bar, stat-item, stat-label, stat-value, gold-bar, pill, card-section.',
-    'Start with a h2 section heading. Include 4-6 sections with h2 headings. Include a stats-bar div with 2-4 real stats.',
-    '900-1100 words. No placeholder text.',
+    'STRUCTURE REQUIREMENTS (mandatory):',
+    '- Start with a h2 section heading',
+    '- Include EXACTLY 5 sections each with a h2 heading',
+    '- Each section must have at least 2 substantial paragraphs of body text',
+    '- Each paragraph must be at least 3 sentences long',
+    '- Include a stats-bar div with 2-4 real stats',
+    '- Include at least one blockquote',
+    'WORD COUNT: The body text MUST be between 900 and 1100 words. This is a strict requirement.',
+    'Count your words before finalising. If you are under 900 words, expand each section further.',
+    'No placeholder text.',
     '',
     'CRITICAL JSON RULES:',
     '- Use straight double quotes only',
