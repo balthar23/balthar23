@@ -71,9 +71,7 @@ async function getPexelsImage(query) {
       'https://api.pexels.com/v1/search?query=' + encodeURIComponent(query) + '&per_page=5&orientation=landscape',
       {
         method: 'GET',
-        headers: {
-          'Authorization': process.env.PEXELS_API_KEY
-        }
+        headers: { 'Authorization': process.env.PEXELS_API_KEY }
       }
     );
     const data = JSON.parse(res.body);
@@ -86,13 +84,133 @@ async function getPexelsImage(query) {
   return null;
 }
 
-// Curated fallback golf images from Pexels (direct URLs, always work)
 const fallbackImages = [
   'https://images.pexels.com/photos/1325681/pexels-photo-1325681.jpeg',
   'https://images.pexels.com/photos/91228/pexels-photo-91228.jpeg',
   'https://images.pexels.com/photos/1174996/pexels-photo-1174996.jpeg',
   'https://images.pexels.com/photos/2735981/pexels-photo-2735981.jpeg',
   'https://images.pexels.com/photos/6542947/pexels-photo-6542947.jpeg'
+];
+
+// Article types rotate by day of week
+// Mon=Tour News, Tue=Instruction, Wed=Equipment, Thu=Player Focus, Fri=Tour News, Sat=Instruction, Sun=Equipment
+const articleTypes = [
+  {
+    // Monday
+    category: 'Tour News',
+    imageQuery: 'golf tournament trophy',
+    searches: [
+      'PGA Tour latest results {month} {year}',
+      'DP World Tour news {month} {year}',
+      'LIV Golf latest {month} {year}'
+    ],
+    instructions: [
+      'Write a tour news roundup covering the latest results and standings from professional golf.',
+      'Include scores, leaderboard positions and any notable performances.',
+      'Include a stats-bar with 2-4 real scores or stats from the research.',
+      'Tone: authoritative, punchy, British golf journalism.'
+    ]
+  },
+  {
+    // Tuesday
+    category: 'Instruction',
+    imageQuery: 'golf swing instruction lesson',
+    searches: [
+      'golf tips mid handicap improvement {year}',
+      'golf swing tips for club golfers {year}',
+      'how to improve golf iron play {year}'
+    ],
+    instructions: [
+      'Write a practical golf instruction article aimed at mid-handicap amateur golfers (10-20 handicap).',
+      'Focus on a specific skill: e.g. iron play, chipping, bunker shots, putting, course management, or the mental game.',
+      'Include actionable tips and drills the reader can take to the course or practice range.',
+      'Include a stats-bar with 2-4 interesting facts or improvement statistics.',
+      'Tone: coaching, encouraging, practical.'
+    ]
+  },
+  {
+    // Wednesday
+    category: 'Equipment & More',
+    imageQuery: 'golf equipment clubs driver',
+    searches: [
+      'best new golf clubs {year} review',
+      'new golf driver release {year}',
+      'golf equipment review {month} {year}'
+    ],
+    instructions: [
+      'Write a golf equipment review or roundup article.',
+      'Cover new club releases, technology innovations, or a "best of" style comparison.',
+      'Include specs, key features and who the equipment suits.',
+      'Include a stats-bar with 2-4 specs or performance stats.',
+      'Tone: informed, enthusiastic, practical buying advice.'
+    ]
+  },
+  {
+    // Thursday
+    category: 'Player Focus',
+    imageQuery: 'professional golfer portrait',
+    searches: [
+      'PGA Tour player spotlight {month} {year}',
+      'rising star professional golf {year}',
+      'golf player profile form {month} {year}'
+    ],
+    instructions: [
+      'Write a player profile or focus piece on a professional golfer who is currently in form or in the news.',
+      'Cover their recent results, playing style, career highlights and what makes them interesting.',
+      'Include a stats-bar with 2-4 career or current season stats.',
+      'Tone: engaging, insightful, fan-friendly.'
+    ]
+  },
+  {
+    // Friday
+    category: 'Tour News',
+    imageQuery: 'golf course green flag',
+    searches: [
+      'PGA Tour weekend preview {month} {year}',
+      'golf tournament this weekend {month} {year}',
+      'DP World Tour upcoming event {month} {year}'
+    ],
+    instructions: [
+      'Write a weekend tournament preview covering what is coming up in professional golf.',
+      'Cover the venue, key contenders, recent form and what to watch out for.',
+      'Include a stats-bar with 2-4 relevant stats about the tournament or course.',
+      'Tone: preview, build anticipation, British golf journalism.'
+    ]
+  },
+  {
+    // Saturday
+    category: 'Instruction',
+    imageQuery: 'golf putting green practice',
+    searches: [
+      'golf course management tips {year}',
+      'golf mental game tips amateur {year}',
+      'golf short game improvement tips {year}'
+    ],
+    instructions: [
+      'Write a practical golf tips article for mid-handicap golfers focused on scoring better.',
+      'Topics could include: course management, reading greens, pre-shot routine, playing in wind, or avoiding big numbers.',
+      'Include actionable advice the reader can use in their next round.',
+      'Include a stats-bar with 2-4 facts or statistics about the topic.',
+      'Tone: friendly, practical, encouraging.'
+    ]
+  },
+  {
+    // Sunday
+    category: 'Equipment & More',
+    imageQuery: 'golf bag accessories rangefinder',
+    searches: [
+      'golf accessories review {year}',
+      'best golf balls mid handicap {year}',
+      'golf technology gadgets {year}'
+    ],
+    instructions: [
+      'Write an equipment or accessories article focused on golf gear that helps mid-handicap golfers.',
+      'Could cover: golf balls, rangefinders, GPS watches, training aids, bags, shoes or apparel.',
+      'Give practical buying advice and recommendations.',
+      'Include a stats-bar with 2-4 specs or value comparisons.',
+      'Tone: helpful, practical, honest buying guide.'
+    ]
+  }
 ];
 
 function extractField(fieldName, str) {
@@ -107,14 +225,18 @@ async function main() {
                   'July','August','September','October','November','December'];
   const month = months[now.getMonth()];
   const year = now.getFullYear();
+  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
 
-  console.log('Searching for golf news:', month, year);
+  // Map day of week to article type (0=Sun uses index 6, 1=Mon uses index 0, etc.)
+  const typeIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  const articleType = articleTypes[typeIndex];
 
-  const queries = [
-    'PGA Tour latest results ' + month + ' ' + year,
-    'DP World Tour news today ' + month + ' ' + year,
-    'LIV Golf latest ' + month + ' ' + year
-  ];
+  console.log('Day of week:', dayOfWeek, '- Article type:', articleType.category);
+
+  // Build search queries for today's type
+  const queries = articleType.searches.map(q =>
+    q.replace('{month}', month).replace('{year}', year)
+  );
 
   let bestArticleUrl = null;
   let searchSummary = '';
@@ -144,13 +266,12 @@ async function main() {
     }
   }
 
-  // Get hero image from Pexels, fall back to curated list
+  // Get hero image
   let heroImg = null;
   if (process.env.PEXELS_API_KEY) {
-    heroImg = await getPexelsImage('golf tournament course');
+    heroImg = await getPexelsImage(articleType.imageQuery);
   }
   if (!heroImg) {
-    // pick a random fallback image
     heroImg = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
     console.log('Using fallback image');
   } else {
@@ -160,8 +281,13 @@ async function main() {
   console.log('Generating post with Groq...');
 
   const prompt = [
-    'You are a golf journalist writing for midhandicap.com, a blog for mid-handicap amateur golfers.',
-    'Based on the following research, write a golf news post. TODAY IS ' + month + ' ' + year + '.',
+    'You are a golf writer for midhandicap.com, a blog for mid-handicap amateur golfers.',
+    'TODAY IS ' + month + ' ' + year + '.',
+    '',
+    'ARTICLE TYPE FOR TODAY: ' + articleType.category,
+    '',
+    'WRITING INSTRUCTIONS:',
+    articleType.instructions.join(' '),
     '',
     'RESEARCH:',
     searchSummary,
@@ -172,7 +298,7 @@ async function main() {
     'Return your response as valid JSON with these exact fields:',
     '{',
     '  "title": "Compelling headline max 70 chars",',
-    '  "category": "Tour News",',
+    '  "category": "' + articleType.category + '",',
     '  "date": "' + month + ' ' + year + '",',
     '  "excerpt": "1-2 sentence teaser max 200 chars",',
     '  "body": "HTML content here"',
@@ -181,8 +307,7 @@ async function main() {
     'For the body field write HTML using only: h2, h3, p, blockquote, div tags.',
     'Allowed div classes: stats-bar, stat-item, stat-label, stat-value, gold-bar, pill, card-section.',
     'Start with a h2 section heading. Include 3-5 sections. Include a stats-bar div with 2-4 real stats.',
-    '350-500 words. Tone: authoritative punchy British golf journalism. No placeholder text.',
-    'category must be one of: Tour News, Equipment & More, Player Focus, Course Guide, Instruction.',
+    '350-500 words. No placeholder text.',
     '',
     'CRITICAL JSON RULES:',
     '- Use straight double quotes only',
