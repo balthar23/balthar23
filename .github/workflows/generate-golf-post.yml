@@ -25,35 +25,37 @@ jobs:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: node scripts/generate-post.js
 
-      - name: Publish post to midhandicap.com
+      - name: Publish and clean up
         env:
           FAIRWAY_API_KEY: ${{ secrets.FAIRWAY_API_KEY }}
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           POST_FILE=$(ls -t pending-posts/*.json 2>/dev/null | head -1)
           if [ -z "$POST_FILE" ]; then
             echo "No post file found"
             exit 1
           fi
+
           echo "Publishing: $POST_FILE"
           cat "$POST_FILE"
+
           RESPONSE=$(curl -s -X POST https://midhandicap.com/api.php/posts \
             -H "Content-Type: application/json" \
             -H "X-API-Key: $FAIRWAY_API_KEY" \
             -d @"$POST_FILE")
+
           echo "API response: $RESPONSE"
+
           if echo "$RESPONSE" | grep -q '"success":true'; then
             echo "✅ Post published successfully"
-            echo "POST_FILE=$POST_FILE" >> $GITHUB_ENV
           else
             echo "❌ Publish failed"
             exit 1
           fi
 
-      - name: Commit and clean up
-        run: |
           git config user.name "golf-bot"
           git config user.email "golf-bot@midhandicap.com"
-          git remote set-url origin https://balthar23:${{ secrets.GH_PAT }}@github.com/balthar23/balthar23.git
+          git remote set-url origin https://balthar23:${GH_PAT}@github.com/balthar23/balthar23.git
           git rm "$POST_FILE"
           git commit -m "Published and cleaned up post [skip ci]"
           git push
