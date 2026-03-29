@@ -400,6 +400,9 @@ async function main() {
     }
   }
 
+  // Clean up body - strip newlines and normalise whitespace
+  postData.body = postData.body.replace(/\\n/g, " ").replace(/\\r/g, "").replace(/  +/g, " ").trim();
+
   const timestamp = Date.now();
   postData.id = timestamp;
   postData.img = heroImg;
