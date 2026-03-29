@@ -65,6 +65,36 @@ async function groqComplete(prompt) {
   return parsed.choices[0].message.content;
 }
 
+async function getPexelsImage(query) {
+  try {
+    const res = await httpsRequest(
+      'https://api.pexels.com/v1/search?query=' + encodeURIComponent(query) + '&per_page=5&orientation=landscape',
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': process.env.PEXELS_API_KEY
+        }
+      }
+    );
+    const data = JSON.parse(res.body);
+    if (data.photos && data.photos.length > 0) {
+      return data.photos[0].src.large2x;
+    }
+  } catch (e) {
+    console.warn('Pexels fetch failed:', e.message);
+  }
+  return null;
+}
+
+// Curated fallback golf images from Pexels (direct URLs, always work)
+const fallbackImages = [
+  'https://images.pexels.com/photos/1325681/pexels-photo-1325681.jpeg',
+  'https://images.pexels.com/photos/91228/pexels-photo-91228.jpeg',
+  'https://images.pexels.com/photos/1174996/pexels-photo-1174996.jpeg',
+  'https://images.pexels.com/photos/2735981/pexels-photo-2735981.jpeg',
+  'https://images.pexels.com/photos/6542947/pexels-photo-6542947.jpeg'
+];
+
 function extractField(fieldName, str) {
   const re = new RegExp('"' + fieldName + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"');
   const m = str.match(re);
@@ -114,12 +144,21 @@ async function main() {
     }
   }
 
-  const unsplashQuery = encodeURIComponent('golf tournament');
-  const heroImg = 'https://source.unsplash.com/1200x600/?' + unsplashQuery;
+  // Get hero image from Pexels, fall back to curated list
+  let heroImg = null;
+  if (process.env.PEXELS_API_KEY) {
+    heroImg = await getPexelsImage('golf tournament course');
+  }
+  if (!heroImg) {
+    // pick a random fallback image
+    heroImg = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
+    console.log('Using fallback image');
+  } else {
+    console.log('Pexels image found:', heroImg);
+  }
 
   console.log('Generating post with Groq...');
 
-  // Ask Groq to return each field separately to avoid JSON escaping issues
   const prompt = [
     'You are a golf journalist writing for midhandicap.com, a blog for mid-handicap amateur golfers.',
     'Based on the following research, write a golf news post. TODAY IS ' + month + ' ' + year + '.',
@@ -158,7 +197,6 @@ async function main() {
 
   let postData;
 
-  // attempt 1: direct parse after stripping fences
   try {
     let cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/, '').trim();
     const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
@@ -167,8 +205,6 @@ async function main() {
     console.log('JSON parsed successfully on first attempt');
   } catch (e1) {
     console.warn('Direct parse failed:', e1.message);
-
-    // attempt 2: extract fields individually
     try {
       console.log('Attempting field extraction fallback...');
       let cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/, '').trim();
@@ -179,15 +215,12 @@ async function main() {
       const category = extractField('category', cleaned);
       const date     = extractField('date', cleaned);
       const excerpt  = extractField('excerpt', cleaned);
-
-      // extract body - everything between "body": " and the final "}
       const bodyMatch = cleaned.match(/"body"\s*:\s*"([\s\S]+?)"\s*\}?\s*$/);
       const body = bodyMatch ? bodyMatch[1] : null;
 
       if (!title || !category || !date || !excerpt || !body) {
         throw new Error('Missing fields after extraction. title=' + title + ' category=' + category);
       }
-
       postData = { title, category, date, excerpt, body };
       console.log('Field extraction succeeded');
     } catch (e2) {
