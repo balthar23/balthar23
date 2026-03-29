@@ -28,6 +28,7 @@ jobs:
         run: |
           git config user.name "golf-bot"
           git config user.email "golf-bot@midhandicap.com"
+          git remote set-url origin https://balthar23:${{ secrets.GH_PAT }}@github.com/balthar23/balthar23.git
           git add pending-posts/
           git diff --cached --quiet || git commit -m "Add golf post: $(date +'%Y-%m-%d')"
           git push
