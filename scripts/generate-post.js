@@ -131,7 +131,7 @@ const articleTypes = [
   {
     // Wednesday
     category: 'Equipment & More',
-    imageQuery: 'golf equipment clubs driver',
+    imageQuery: 'golf equipment',
     searches: [
       'best new golf clubs {year} review',
       'new golf driver release {year}',
@@ -148,7 +148,7 @@ const articleTypes = [
   {
     // Thursday
     category: 'Player Focus',
-    imageQuery: 'professional golfer portrait',
+    imageQuery: 'professional golfer',
     searches: [
       'PGA Tour player spotlight {month} {year}',
       'rising star professional golf {year}',
@@ -180,7 +180,7 @@ const articleTypes = [
   {
     // Saturday
     category: 'Instruction',
-    imageQuery: 'golf putting green practice',
+    imageQuery: 'golf practice',
     searches: [
       'golf course management tips {year}',
       'golf mental game tips amateur {year}',
@@ -197,7 +197,7 @@ const articleTypes = [
   {
     // Sunday
     category: 'Equipment & More',
-    imageQuery: 'golf bag accessories rangefinder',
+    imageQuery: 'golf equipment',
     searches: [
       'golf accessories review {year}',
       'best golf balls mid handicap {year}',
