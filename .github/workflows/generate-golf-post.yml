@@ -36,6 +36,7 @@ jobs:
 
       - name: Trigger publish workflow
         run: |
+          sleep 10
           curl -s -X POST \
             -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
             -H "Accept: application/vnd.github.v3+json" \
