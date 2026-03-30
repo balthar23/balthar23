@@ -347,7 +347,7 @@ const schedule = {
       category: 'Player Focus',
       imageQuery: 'women golf LPGA tour player',
       searches: ['LPGA Tour news results {month} {year}', 'best women golfer world {month} {year}', 'womens golf highlights {month} {year}'],
-      instructions: 'Write a player profile or news piece focused on the LPGA Tour or women's professional golf. Cover results, player profiles, tour news or a feature on a leading player. Include a stats-bar with 2-4 stats. Tone: celebratory, authoritative, inspiring.'
+      instructions: 'Write a player profile or news piece focused on the LPGA Tour or womens professional golf. Cover results, player profiles, tour news or a feature on a leading player. Include a stats-bar with 2-4 stats. Tone: celebratory, authoritative, inspiring.'
     }
   ]
 };
