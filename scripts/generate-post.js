@@ -1,121 +1,6 @@
 const https = require('https');
 const fs = require('fs');
 
-// ─── Amazon AU affiliate tag ─────────────────────────────────────────────────
-const AMAZON_TAG = 'midhandicap-22';
-
-// ─── Product link library ────────────────────────────────────────────────────
-// Keywords matched case-insensitively against post body.
-// More specific entries must come before generic ones.
-const productLibrary = [
-  // IRONS (specific models first)
-  { keywords: ['callaway rogue st', 'rogue st irons', 'rogue st iron'], label: 'Callaway Rogue ST Irons', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+Rogue+ST+irons` },
-  { keywords: ['taylormade stealth irons', 'stealth irons', 'stealth 2 irons'], label: 'TaylorMade Stealth Irons', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=TaylorMade+Stealth+irons` },
-  { keywords: ['ping g430 irons', 'ping g430 iron'], label: 'Ping G430 Irons', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Ping+G430+irons` },
-  { keywords: ['titleist t300', 't300 irons'], label: 'Titleist T300 Irons', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+T300+irons` },
-  { keywords: ['cleveland launcher xl', 'launcher xl irons'], label: 'Cleveland Launcher XL Irons', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Cleveland+Launcher+XL+irons` },
-  { keywords: ['cobra aerojet irons', 'aerojet irons'], label: 'Cobra Aerojet Irons', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Cobra+Aerojet+irons` },
-
-  // DRIVERS
-  { keywords: ['taylormade qi10', 'qi10 driver'], label: 'TaylorMade Qi10 Driver', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=TaylorMade+Qi10+driver` },
-  { keywords: ['callaway paradym', 'paradym driver'], label: 'Callaway Paradym Driver', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+Paradym+driver` },
-  { keywords: ['ping g430 max', 'ping g430 driver'], label: 'Ping G430 Max Driver', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Ping+G430+Max+driver` },
-  { keywords: ['cobra aerojet driver'], label: 'Cobra Aerojet Driver', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Cobra+Aerojet+driver` },
-
-  // BALLS — Pro V1x must come before Pro V1
-  { keywords: ['pro v1x', 'prov1x'], label: 'Titleist Pro V1x Golf Balls', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+Pro+V1x+golf+balls` },
-  { keywords: ['pro v1', 'prov1'], label: 'Titleist Pro V1 Golf Balls', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+Pro+V1+golf+balls` },
-  { keywords: ['chrome soft', 'callaway chrome soft'], label: 'Callaway Chrome Soft Golf Balls', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+Chrome+Soft+golf+balls` },
-  { keywords: ['taylormade tp5', 'tp5 golf ball'], label: 'TaylorMade TP5 Golf Balls', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=TaylorMade+TP5+golf+balls` },
-  { keywords: ['srixon z-star', 'srixon zstar', 'z-star golf'], label: 'Srixon Z-Star Golf Balls', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Srixon+Z-Star+golf+balls` },
-  { keywords: ['bridgestone tour b', 'bridgestone golf'], label: 'Bridgestone Tour B Golf Balls', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Bridgestone+Tour+B+golf+balls` },
-  { keywords: ['vice pro golf', 'vice pro ball'], label: 'Vice Pro Golf Balls', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Vice+Pro+golf+balls` },
-
-  // RANGEFINDERS
-  { keywords: ['bushnell pro x3', 'bushnell pro x'], label: 'Bushnell Pro X3 Rangefinder', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Bushnell+Pro+X3+rangefinder` },
-  { keywords: ['garmin approach z82', 'garmin z82'], label: 'Garmin Approach Z82 Rangefinder', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Garmin+Approach+Z82+rangefinder` },
-  { keywords: ['nikon coolshot'], label: 'Nikon Coolshot Rangefinder', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Nikon+Coolshot+golf+rangefinder` },
-
-  // GPS WATCHES
-  { keywords: ['garmin approach s62', 'garmin s62'], label: 'Garmin Approach S62 GPS Watch', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Garmin+Approach+S62+golf+watch` },
-  { keywords: ['garmin approach s42', 'garmin s42'], label: 'Garmin Approach S42 GPS Watch', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Garmin+Approach+S42+golf+watch` },
-  { keywords: ['shot scope v5', 'shot scope watch'], label: 'Shot Scope V5 GPS Watch', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Shot+Scope+V5+GPS+golf+watch` },
-
-  // HYBRIDS
-  { keywords: ['taylormade stealth hybrid', 'stealth hybrid'], label: 'TaylorMade Stealth Hybrid', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=TaylorMade+Stealth+hybrid` },
-  { keywords: ['callaway apex hybrid'], label: 'Callaway Apex Hybrid', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+Apex+hybrid` },
-  { keywords: ['ping g430 hybrid'], label: 'Ping G430 Hybrid', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Ping+G430+hybrid` },
-
-  // WEDGES
-  { keywords: ['vokey sm9', 'titleist vokey'], label: 'Titleist Vokey SM9 Wedge', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+Vokey+SM9+wedge` },
-  { keywords: ['cleveland rtx', 'cleveland wedge'], label: 'Cleveland RTX Wedge', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Cleveland+RTX+wedge` },
-  { keywords: ['callaway mack daddy', 'mack daddy wedge'], label: 'Callaway Mack Daddy Wedge', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+Mack+Daddy+wedge` },
-
-  // PUTTERS
-  { keywords: ['odyssey white hot', 'odyssey putter'], label: 'Odyssey White Hot Putter', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Odyssey+White+Hot+putter` },
-  { keywords: ['scotty cameron', 'scotty cameron putter'], label: 'Scotty Cameron Putter', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Scotty+Cameron+putter` },
-  { keywords: ['ping sigma 2', 'ping putter'], label: 'Ping Sigma 2 Putter', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Ping+Sigma+2+putter` },
-
-  // TRAINING AIDS
-  { keywords: ['orange whip'], label: 'Orange Whip Swing Trainer', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Orange+Whip+golf+swing+trainer` },
-  { keywords: ['alignment stick', 'alignment sticks'], label: 'Golf Alignment Sticks', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+alignment+sticks` },
-  { keywords: ['impact bag', 'golf impact bag'], label: 'Golf Impact Bag Training Aid', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+impact+bag` },
-  { keywords: ['swing trainer', 'golf swing trainer'], label: 'Golf Swing Trainer', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+swing+trainer` },
-  { keywords: ['putting mat', 'golf putting mat'], label: 'Golf Putting Mat', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+putting+mat` },
-
-  // GENERIC FALLBACKS — only matched if nothing specific found above
-  { keywords: ['golf irons', 'set of irons', 'iron set'], label: 'Golf Irons on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+irons+mid+handicap` },
-  { keywords: ['golf driver', 'new driver'], label: 'Golf Driver on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+driver` },
-  { keywords: ['golf balls', 'dozen balls'], label: 'Golf Balls on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+balls+mid+handicap` },
-  { keywords: ['rangefinder'], label: 'Golf Rangefinder on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+rangefinder` },
-  { keywords: ['gps watch', 'golf watch'], label: 'Golf GPS Watch on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+GPS+watch` },
-  { keywords: ['hybrid club', 'hybrid iron'], label: 'Golf Hybrid on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+hybrid+club` },
-  { keywords: ['golf wedge', 'wedge loft'], label: 'Golf Wedges on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+wedges` },
-  { keywords: ['golf putter', 'putter style'], label: 'Golf Putters on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+putters` },
-  { keywords: ['golf shoes'], label: 'Golf Shoes on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+shoes` },
-  { keywords: ['golf bag'], label: 'Golf Bags on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+bag` }
-];
-
-// ─── Inject affiliate links into post body ───────────────────────────────────
-function injectAffiliateLinks(body) {
-  const bodyLower = body.toLowerCase();
-
-  // Build ordered list of matched products, preserving library order (specific first)
-  const seen = new Set();
-  const matched = [];
-  for (const product of productLibrary) {
-    for (const kw of product.keywords) {
-      if (bodyLower.includes(kw.toLowerCase()) && !seen.has(product.label)) {
-        matched.push(product);
-        seen.add(product.label);
-        break;
-      }
-    }
-  }
-
-  console.log(`Affiliate links matched (${matched.length}):`, matched.map(p => p.label).join(', ') || 'none');
-
-  // If nothing matched at all, use a safe generic fallback pool
-  const fallbackPool = [
-    { label: 'Golf Equipment on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+equipment` },
-    { label: 'Golf Clubs on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+clubs` },
-    { label: 'Golf Accessories on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+accessories` }
-  ];
-
-  let matchIndex = 0;
-  const result = body.replace(/\[AFFILIATE LINK\]/gi, () => {
-    const product = matched[matchIndex] || fallbackPool[matchIndex % fallbackPool.length];
-    matchIndex++;
-    return `<a href="${product.url}" target="_blank" rel="noopener sponsored" class="affiliate-link">${product.label} &rarr;</a>`;
-  });
-
-  // Count how many were replaced
-  const count = (body.match(/\[AFFILIATE LINK\]/gi) || []).length;
-  console.log(`Replaced ${count} [AFFILIATE LINK] placeholder(s)`);
-
-  return result;
-}
-
 function httpsRequest(url, options, body) {
   return new Promise((resolve, reject) => {
     const req = https.request(url, options, (res) => {
@@ -250,31 +135,31 @@ const schedule = {
       category: 'Instruction',
       imageQuery: 'golf swing instruction lesson driving range',
       searches: ['golf swing tips mid handicap {year}', 'how to improve golf iron play {year}', 'golf driving tips amateur {year}'],
-      instructions: 'Write a practical golf instruction article for mid-handicap golfers focusing on full swing technique. Include step-by-step tips and drills. Mention alignment sticks [AFFILIATE LINK] as a useful practice tool. Include a stats-bar with 2-4 improvement stats. Tone: coaching, encouraging, practical.'
+      instructions: 'Write a practical golf instruction article for mid-handicap golfers focusing on full swing technique — driving, iron play or fairway woods. Include step-by-step tips and drills. Include a stats-bar with 2-4 improvement stats. Tone: coaching, encouraging, practical.'
     },
     {
       category: 'Instruction',
       imageQuery: 'golf short game chipping bunker',
       searches: ['golf short game tips improvement {year}', 'golf chipping tips amateur {year}', 'bunker play golf tips {year}'],
-      instructions: 'Write a short game instruction article for mid-handicap golfers. Focus on chipping, pitching or bunker play. Recommend a Cleveland RTX wedge [AFFILIATE LINK] as the go-to option. Include step-by-step tips. Include a stats-bar with 2-4 stats. Tone: friendly, practical, encouraging.'
+      instructions: 'Write a short game instruction article for mid-handicap golfers. Focus on chipping, pitching or bunker play. Include step-by-step tips and on-course drills. Include a stats-bar with 2-4 scoring or short game stats. Tone: friendly, practical, encouraging.'
     },
     {
       category: 'Instruction',
       imageQuery: 'golf putting green practice stroke',
       searches: ['golf putting tips improvement {year}', 'how to putt better amateur golf {year}', 'golf green reading tips {year}'],
-      instructions: 'Write a putting instruction article for mid-handicap golfers. Cover stroke technique, distance control or green reading. Recommend a golf putting mat [AFFILIATE LINK] for home practice. Include practical drills. Include a stats-bar with 2-4 putting stats. Tone: coaching, focused, practical.'
+      instructions: 'Write a putting instruction article for mid-handicap golfers. Cover stroke technique, green reading, distance control or pre-putt routine. Include practical drills. Include a stats-bar with 2-4 putting stats. Tone: coaching, focused, practical.'
     },
     {
       category: 'Instruction',
       imageQuery: 'golf course management strategy',
       searches: ['golf course management tips scoring {year}', 'golf mental game strategy {year}', 'how to score better golf round {year}'],
-      instructions: 'Write a course management and strategy article for mid-handicap golfers. Cover laying up, club selection, playing to strengths and avoiding big numbers. Recommend a Garmin Approach S42 GPS watch [AFFILIATE LINK] for precise distance measurement. Include a stats-bar with 2-4 scoring stats. Tone: strategic, insightful, practical.'
+      instructions: 'Write a course management and strategy article for mid-handicap golfers. Cover laying up, club selection, playing to strengths, avoiding big numbers or the mental game. Include a stats-bar with 2-4 scoring stats. Tone: strategic, insightful, practical.'
     },
     {
       category: 'Instruction',
       imageQuery: 'golf practice drills training aid',
       searches: ['golf practice drills at home {year}', 'golf training aids review {year}', 'best golf practice routine {year}'],
-      instructions: 'Write a practice and improvement article for mid-handicap golfers. Cover effective drills and training aids. Recommend an Orange Whip swing trainer [AFFILIATE LINK] and alignment sticks [AFFILIATE LINK] as must-have aids. Include a stats-bar with 2-4 improvement stats. Tone: motivating, practical, evidence-based.'
+      instructions: 'Write a practice and improvement article for mid-handicap golfers. Cover effective practice drills, training aids or how to structure a practice session. Include a stats-bar with 2-4 improvement or practice stats. Tone: motivating, practical, evidence-based.'
     },
     {
       category: 'Instruction',
@@ -286,68 +171,67 @@ const schedule = {
       category: 'Instruction',
       imageQuery: 'golf pre shot routine setup address',
       searches: ['golf pre shot routine tips {year}', 'golf setup and alignment tips {year}', 'golf consistency tips amateur {year}'],
-      instructions: 'Write an article about building consistency through routine and setup. Cover pre-shot routine, alignment, grip and stance. Recommend alignment sticks [AFFILIATE LINK] as the simplest consistency tool. Include a stats-bar with 2-4 stats. Tone: methodical, practical, encouraging.'
+      instructions: 'Write an article about building consistency in golf through routine and setup. Cover pre-shot routine, alignment, grip, stance and how to replicate good shots. Include a stats-bar with 2-4 stats about consistency or handicap improvement. Tone: methodical, practical, encouraging.'
     },
     {
       category: 'Instruction',
       imageQuery: 'golf ball striking impact position',
       searches: ['golf ball striking tips {year}', 'how to hit golf ball better {year}', 'golf impact position tips {year}'],
-      instructions: 'Write an article on improving ball striking for mid-handicap golfers. Cover impact position, compression and common mistakes. Recommend a golf impact bag [AFFILIATE LINK] as a great drill aid. Include a stats-bar with 2-4 relevant stats. Tone: technical but accessible, practical.'
-    },
-    // ─── AFFILIATE-FOCUSED ARTICLE TYPES ─────────────────────────────────────
-    {
-      category: 'Equipment & More',
-      imageQuery: 'golf irons set mid handicap',
-      searches: ['best irons for mid handicappers {year} review', 'game improvement irons 10-20 handicap {year}', 'best mid handicap irons Callaway TaylorMade Ping {year}'],
-      instructions: 'Write a buyer\'s guide titled "Best Irons for Mid Handicappers {year}" for midhandicap.com. Audience: 10-20 handicap golfers buying new irons. Recommend 3 specific iron models by name — Callaway Rogue ST [AFFILIATE LINK], TaylorMade Stealth Irons [AFFILIATE LINK], Ping G430 Irons [AFFILIATE LINK]. For each include key feature, who it suits, price range. Add a comparison table and buying tips. Include a stats-bar with 2-3 real specs. Tone: knowledgeable fellow golfer, not salesy. Min 900 words.'
+      instructions: 'Write an article on improving ball striking for mid-handicap golfers. Cover impact position, compression, contact quality and common mistakes to avoid. Include practical drills. Include a stats-bar with 2-4 relevant stats. Tone: technical but accessible, practical.'
     },
     {
       category: 'Equipment & More',
-      imageQuery: 'golf balls mid handicapper',
-      searches: ['best golf balls for mid handicappers {year}', 'golf ball comparison mid handicap distance spin {year}', 'Titleist Pro V1 vs Callaway Chrome Soft mid handicap {year}'],
-      instructions: 'Write a buyer\'s guide titled "Best Golf Balls for Mid Handicappers {year}" for midhandicap.com. Recommend 4 specific golf balls by name — Titleist Pro V1 [AFFILIATE LINK], Callaway Chrome Soft [AFFILIATE LINK], TaylorMade TP5 [AFFILIATE LINK], Srixon Z-Star [AFFILIATE LINK]. Include compression, feel, distance, price. Comparison table. Include a stats-bar with 2-3 compression stats. Tone: practical, honest, golfer-to-golfer. Min 900 words.'
+      imageQuery: 'golf driver club new technology',
+      searches: ['best new golf driver {year} review', 'new golf clubs release {year}', 'golf equipment review {month} {year}'],
+      instructions: 'Write a golf equipment review covering the latest driver or iron releases. Include specs, key technology features, who each club suits and value for money. Include a stats-bar with 2-4 specs or performance stats. Tone: informed, enthusiastic, practical buying advice.'
     },
     {
       category: 'Equipment & More',
-      imageQuery: 'golf driver swing speed distance',
-      searches: ['best golf driver for 70-80 mph swing speed {year}', 'best driver for average golfer mid handicap {year}', 'forgiving drivers for mid handicappers {year}'],
-      instructions: 'Write a buyer\'s guide titled "Best Golf Drivers for 70-80 mph Swing Speed {year}" for midhandicap.com. Recommend 3 specific drivers — TaylorMade Qi10 [AFFILIATE LINK], Callaway Paradym [AFFILIATE LINK], Ping G430 Max [AFFILIATE LINK]. Include specs, loft, price. Comparison table. Include a stats-bar with 2-3 distance stats. Tone: informed, practical, golfer-to-golfer. Min 900 words.'
+      imageQuery: 'golf balls selection comparison',
+      searches: ['best golf balls mid handicap {year}', 'golf ball review comparison {year}', 'golf ball distance spin {year}'],
+      instructions: 'Write a golf ball review comparing distance, spin, feel and price across popular models. Give clear recommendations for different player types. Include a stats-bar with 2-4 specs or performance comparisons. Tone: helpful, practical, honest.'
     },
     {
       category: 'Equipment & More',
-      imageQuery: 'golf rangefinder GPS watch comparison',
-      searches: ['best golf rangefinder {year} review mid handicap', 'rangefinder vs GPS golf watch which is better {year}', 'best GPS golf watch {year}'],
-      instructions: 'Write a comparison article "Rangefinder vs GPS Watch: Which Is Better for Mid Handicappers?" for midhandicap.com. Recommend Bushnell Pro X3 [AFFILIATE LINK] as the rangefinder pick and Garmin Approach S62 [AFFILIATE LINK] as the GPS watch pick. Head-to-head comparison table. Honest verdict. Include a stats-bar with 2-3 accuracy/price stats. Tone: helpful, balanced, practical. Min 900 words.'
+      imageQuery: 'golf accessories rangefinder GPS watch',
+      searches: ['best golf rangefinder {year} review', 'golf GPS watch review {year}', 'golf technology accessories {year}'],
+      instructions: 'Write an equipment review covering golf technology accessories — rangefinders, GPS watches or launch monitors. Include key features, accuracy, battery life and value. Include a stats-bar with 2-4 specs or comparisons. Tone: tech-savvy, practical, helpful.'
     },
     {
       category: 'Equipment & More',
-      imageQuery: 'golf hybrid club fairway wood',
-      searches: ['best hybrid clubs for mid handicappers {year}', 'should mid handicapper use hybrid instead of long irons {year}', 'best hybrid golf clubs {year} review'],
-      instructions: 'Write a buyer\'s guide "Best Hybrids to Replace Your Long Irons in {year}" for midhandicap.com. Recommend TaylorMade Stealth Hybrid [AFFILIATE LINK], Callaway Apex Hybrid [AFFILIATE LINK], Ping G430 Hybrid [AFFILIATE LINK]. Include loft options, forgiveness, price. Comparison table. Include a stats-bar with 2-3 stats. Tone: practical, encouraging, knowledgeable. Min 900 words.'
+      imageQuery: 'golf bag accessories equipment',
+      searches: ['golf accessories review {year}', 'best golf bag {year}', 'golf equipment accessories {year}'],
+      instructions: 'Write a golf accessories and gear article. Cover golf bags, headcovers, gloves, tees, umbrellas or other accessories. Give practical recommendations. Include a stats-bar with 2-4 specs or value comparisons. Tone: helpful, practical, honest buying guide.'
     },
     {
       category: 'Equipment & More',
-      imageQuery: 'Titleist Pro V1 golf ball comparison',
-      searches: ['Titleist Pro V1 vs Pro V1x mid handicap {year}', 'Pro V1 or Pro V1x which for mid handicapper', 'best premium golf ball for 15 handicap {year}'],
-      instructions: 'Write a comparison "Titleist Pro V1 vs Pro V1x: Which Should Mid Handicappers Play?" for midhandicap.com. Feature Pro V1 [AFFILIATE LINK] vs Pro V1x [AFFILIATE LINK]. Head-to-head table (compression, spin, feel, price). Honest verdict. Include a stats-bar with 2-3 stats. Tone: authoritative, honest, no marketing spin. Min 900 words.'
+      imageQuery: 'golf iron set clubs mid handicap',
+      searches: ['best golf irons mid handicap {year}', 'game improvement irons review {year}', 'golf irons buying guide {year}'],
+      instructions: 'Write a golf irons buying guide or review aimed at mid-handicap golfers. Cover forgiveness, distance, feel and value across different iron sets. Give clear recommendations. Include a stats-bar with 2-4 specs or performance stats. Tone: informed, practical, helpful.'
     },
     {
       category: 'Equipment & More',
-      imageQuery: 'TaylorMade Callaway golf irons comparison',
-      searches: ['TaylorMade vs Callaway irons {year} mid handicap', 'Stealth vs Rogue irons comparison {year}', 'best irons brand for mid handicapper {year}'],
-      instructions: 'Write a comparison "TaylorMade vs Callaway Irons {year}: Which Is Better for Mid Handicappers?" for midhandicap.com. Feature TaylorMade Stealth Irons [AFFILIATE LINK] vs Callaway Rogue ST [AFFILIATE LINK]. Head-to-head table (forgiveness, distance, feel, price). Balanced verdict. Include a stats-bar with 2-3 specs. Tone: balanced, knowledgeable, no brand bias. Min 900 words.'
-    },
-    {
-      category: 'Instruction',
-      imageQuery: 'golf score card improvement strategy',
-      searches: ['how to break 90 golf tips strategy {year}', 'golf course management tips to shoot lower scores', 'breaking 90 golf plan mid handicap'],
-      instructions: 'Write a strategy guide "How to Break 90: A Realistic Plan for Mid Handicappers" for midhandicap.com. Cover tee shots, approach shots, short game, putting, course management. Recommend alignment sticks [AFFILIATE LINK] for practice and a Garmin Approach S42 GPS watch [AFFILIATE LINK] for on-course distance management. Include a sample scorecard strategy. Include a stats-bar with 2-3 stats. Tone: motivating, practical, experience-based. Min 900 words.'
+      imageQuery: 'golf wedge short game equipment',
+      searches: ['best golf wedges {year} review', 'golf wedge buying guide {year}', 'golf wedge loft selection {year}'],
+      instructions: 'Write a golf wedge review or buying guide. Cover loft gapping, bounce, grind options and which wedges suit different golfers. Include a stats-bar with 2-4 specs or performance stats. Tone: technical but accessible, practical buying advice.'
     },
     {
       category: 'Equipment & More',
-      imageQuery: 'golf accessories training aids collection',
-      searches: ['best golf accessories mid handicapper {year}', 'golf training aids review {year}', 'best golf gadgets {year}'],
-      instructions: 'Write an equipment roundup "Best Golf Accessories for Mid Handicappers {year}" for midhandicap.com. Cover Bushnell Pro X3 rangefinder [AFFILIATE LINK], Garmin Approach S42 GPS watch [AFFILIATE LINK], golf alignment sticks [AFFILIATE LINK], Orange Whip swing trainer [AFFILIATE LINK], golf putting mat [AFFILIATE LINK]. Include a stats-bar with 2-3 stats. Tone: enthusiastic, practical, buying-guide style. Min 900 words.'
+      imageQuery: 'golf putter styles mallet blade',
+      searches: ['best golf putters {year} review', 'golf putter buying guide {year}', 'mallet vs blade putter {year}'],
+      instructions: 'Write a putter review or buying guide. Compare blade and mallet styles, alignment aids, shaft options and what suits different putting strokes. Include a stats-bar with 2-4 specs or stats. Tone: informed, practical, helpful.'
+    },
+    {
+      category: 'Equipment & More',
+      imageQuery: 'golf shoes spikeless waterproof',
+      searches: ['best golf shoes {year} review', 'golf shoes waterproof comfort {year}', 'spikeless golf shoes {year}'],
+      instructions: 'Write a golf shoes review or buying guide. Cover comfort, waterproofing, grip, stability and style. Compare spiked vs spikeless options. Include a stats-bar with 2-4 specs or comparisons. Tone: practical, helpful, honest.'
+    },
+    {
+      category: 'Equipment & More',
+      imageQuery: 'golf simulator home launch monitor',
+      searches: ['home golf simulator review {year}', 'golf launch monitor {year}', 'indoor golf practice technology {year}'],
+      instructions: 'Write an article about golf simulators or home launch monitors. Cover accuracy, features, setup requirements and value for money. Include a stats-bar with 2-4 specs or comparisons. Tone: enthusiastic, tech-savvy, practical.'
     }
   ],
   evening: [
@@ -367,25 +251,25 @@ const schedule = {
       category: 'Player Focus',
       imageQuery: 'golf legend career highlight',
       searches: ['golf legend career highlights {year}', 'greatest golfers of all time {year}', 'golf hall of fame player {year}'],
-      instructions: 'Write a retrospective player profile on a golf legend or hall of famer. Cover career highlights, major wins, playing style and lasting legacy. Include a stats-bar with 2-4 career stats. Tone: reverent, celebratory, insightful.'
+      instructions: 'Write a retrospective player profile on a golf legend or hall of famer. Cover career highlights, major wins, playing style and lasting legacy on the game. Include a stats-bar with 2-4 career stats. Tone: reverent, celebratory, insightful.'
     },
     {
       category: 'Player Focus',
       imageQuery: 'golf world number one ranking',
       searches: ['world number one golfer {month} {year}', 'best golfer in the world {year}', 'Scottie Scheffler golf {year}'],
-      instructions: 'Write a profile on the current world number one golfer. Cover recent form, strengths, records and what sets them apart. Include a stats-bar with 2-4 ranking or performance stats. Tone: authoritative, analytical, fan-friendly.'
+      instructions: 'Write a profile on the current world number one golfer or the player dominating the rankings. Cover their recent form, strengths, records and what sets them apart. Include a stats-bar with 2-4 ranking or performance stats. Tone: authoritative, analytical, fan-friendly.'
     },
     {
       category: 'Player Focus',
       imageQuery: 'golf comeback story emotional',
       searches: ['golf comeback story {year}', 'golfer return from injury {year}', 'inspirational golf story {year}'],
-      instructions: 'Write an inspirational player focus piece on a golfer who has overcome adversity — injury, illness or a career slump. Cover their story, struggles and comeback. Include a stats-bar with 2-4 relevant stats. Tone: inspirational, emotional, fan-friendly.'
+      instructions: 'Write an inspirational player focus piece on a golfer who has overcome adversity — injury, illness or a career slump — to return to form. Cover their story, struggles and comeback. Include a stats-bar with 2-4 relevant stats. Tone: inspirational, emotional, fan-friendly.'
     },
     {
       category: 'Course Guide',
       imageQuery: 'famous golf course landscape scenic',
       searches: ['famous golf courses world top ranked {year}', 'bucket list golf courses {year}', 'best golf courses to play {year}'],
-      instructions: 'Write a course guide on a famous or bucket-list golf course. Cover history, signature holes, challenges and what makes it special. Include a stats-bar with 2-4 course facts. Tone: evocative, descriptive, inspiring.'
+      instructions: 'Write a course guide on a famous or bucket-list golf course. Cover the history, signature holes, challenges and what makes it special. Include a stats-bar with 2-4 course facts like par, yardage or notable records. Tone: evocative, descriptive, inspiring.'
     },
     {
       category: 'Course Guide',
@@ -403,13 +287,13 @@ const schedule = {
       category: 'Course Guide',
       imageQuery: 'golf course Australia New Zealand Pacific',
       searches: ['best golf courses Australia {year}', 'Royal Melbourne golf course {year}', 'top golf courses Asia Pacific {year}'],
-      instructions: 'Write a course guide focused on great golf courses in Australia or the Asia Pacific region. Cover layout, conditions, history and what makes them stand out. Recommend a Bushnell Pro X3 rangefinder [AFFILIATE LINK] as ideal for visiting golfers unfamiliar with the course. Include a stats-bar with 2-4 course facts. Tone: enthusiastic, descriptive, inspiring.'
+      instructions: 'Write a course guide focused on great golf courses in Australia or the Asia Pacific region. Cover layout, conditions, history and what makes them stand out. Include a stats-bar with 2-4 course facts. Tone: enthusiastic, descriptive, inspiring.'
     },
     {
       category: 'Course Guide',
       imageQuery: 'golf resort destination travel',
       searches: ['best golf resorts world {year}', 'golf holiday destination {year}', 'golf travel bucket list {year}'],
-      instructions: 'Write a golf travel and destination guide. Cover a great golf resort or destination, courses available, facilities, best time to visit and travel tips. Recommend Titleist Pro V1 golf balls [AFFILIATE LINK] as the ball to bring. Include a stats-bar with 2-4 destination or course facts. Tone: inspiring, practical, travel-focused.'
+      instructions: 'Write a golf travel and destination guide. Cover a great golf resort or destination, what courses are available, facilities, best time to visit and travel tips. Include a stats-bar with 2-4 destination or course facts. Tone: inspiring, practical, travel-focused.'
     },
     {
       category: 'Course Guide',
@@ -427,67 +311,80 @@ const schedule = {
       category: 'Equipment & More',
       imageQuery: 'golf fairway wood hybrid club',
       searches: ['best golf fairway woods hybrids {year}', 'fairway wood vs hybrid {year}', 'golf hybrid buying guide {year}'],
-      instructions: 'Write a buying guide covering fairway woods and hybrids. Compare the two categories, cover key models and explain who should use each. Recommend TaylorMade Stealth Hybrid [AFFILIATE LINK] as the top mid-handicap pick. Include a stats-bar with 2-4 specs. Tone: informed, practical, helpful.'
+      instructions: 'Write a buying guide or review covering fairway woods and hybrids. Compare the two categories, cover key models and explain who should use each. Include a stats-bar with 2-4 specs or performance stats. Tone: informed, practical, helpful.'
     },
     {
       category: 'Instruction',
       imageQuery: 'golf beginner tips basics',
       searches: ['golf tips for beginners high handicap {year}', 'how to improve fast golf {year}', 'golf basics fundamentals {year}'],
-      instructions: 'Write a fundamentals article for higher handicap golfers. Cover grip, stance, alignment, posture. Recommend alignment sticks [AFFILIATE LINK] as the single most useful tool for any golfer working on fundamentals. Include a stats-bar with 2-4 relevant stats. Tone: encouraging, clear, accessible.'
+      instructions: 'Write a fundamentals article aimed at higher handicap golfers looking to improve quickly. Cover the basics — grip, stance, alignment, posture — and why getting them right makes such a difference. Include a stats-bar with 2-4 relevant stats. Tone: encouraging, clear, accessible.'
     },
     {
       category: 'Instruction',
       imageQuery: 'golf weather wind rain playing conditions',
       searches: ['golf tips playing in wind {year}', 'golf wet weather tips {year}', 'how to play golf in bad weather {year}'],
-      instructions: 'Write an article about playing golf in challenging weather conditions. Cover club selection adjustments, ball flight management and maintaining focus. Recommend Callaway Chrome Soft golf balls [AFFILIATE LINK] as a great low-spin option in the wind. Include a stats-bar with 2-4 relevant stats. Tone: practical, experienced, helpful.'
+      instructions: 'Write an article about playing golf in challenging weather conditions — wind, rain or cold. Cover club selection adjustments, ball flight management and maintaining focus. Include a stats-bar with 2-4 relevant stats. Tone: practical, experienced, helpful.'
     },
     {
       category: 'Instruction',
       imageQuery: 'golf mental game confidence focus',
       searches: ['golf mental game tips {year}', 'golf psychology confidence {year}', 'how to focus better golf {year}'],
-      instructions: 'Write a golf psychology and mental game article. Cover managing pressure, staying focused, dealing with bad shots and building confidence. Include a stats-bar with 2-4 relevant stats. Tone: thoughtful, practical, motivating.'
+      instructions: 'Write a golf psychology and mental game article. Cover managing pressure, staying focused, dealing with bad shots and building confidence on the course. Include a stats-bar with 2-4 relevant stats. Tone: thoughtful, practical, motivating.'
     },
     {
       category: 'Tour News',
       imageQuery: 'golf prize money tour earnings',
       searches: ['golf prize money rankings {month} {year}', 'PGA Tour money list {month} {year}', 'richest golfers earnings {year}'],
-      instructions: 'Write a tour news article focused on prize money, earnings and the financial side of professional golf. Cover money list leaders, biggest prize funds and how earnings compare across tours. Include a stats-bar with 2-4 earnings or prize fund stats. Tone: authoritative, informative, engaging.'
+      instructions: 'Write a tour news article focused on prize money, earnings and the financial side of professional golf. Cover the money list leaders, biggest prize funds and how earnings compare across tours. Include a stats-bar with 2-4 earnings or prize fund stats. Tone: authoritative, informative, engaging.'
     },
     {
       category: 'Tour News',
       imageQuery: 'golf news controversy debate',
       searches: ['golf news controversy {month} {year}', 'golf rule change debate {year}', 'golf tour politics news {month} {year}'],
-      instructions: 'Write a golf news feature on a current debate, controversy or talking point. Cover different perspectives, background and what it means for golf. Include a stats-bar with 2-4 relevant facts. Tone: balanced, analytical, British golf journalism.'
+      instructions: 'Write a golf news feature on a current debate, controversy or talking point in the game. Cover different perspectives, the background and what it means for golf going forward. Include a stats-bar with 2-4 relevant facts or stats. Tone: balanced, analytical, British golf journalism.'
     },
     {
       category: 'Player Focus',
       imageQuery: 'women golf LPGA tour player',
       searches: ['LPGA Tour news results {month} {year}', 'best women golfer world {month} {year}', 'womens golf highlights {month} {year}'],
       instructions: 'Write a player profile or news piece focused on the LPGA Tour or womens professional golf. Cover results, player profiles, tour news or a feature on a leading player. Include a stats-bar with 2-4 stats. Tone: celebratory, authoritative, inspiring.'
-    },
-    // ─── AFFILIATE-FOCUSED EVENING TYPES ─────────────────────────────────────
-    {
-      category: 'Equipment & More',
-      imageQuery: 'golf wedge short game equipment',
-      searches: ['best golf wedges mid handicap {year}', 'golf wedge buying guide {year}', 'golf wedge loft selection {year}'],
-      instructions: 'Write a golf wedge review or buying guide for midhandicap.com. Cover loft gapping, bounce, grind options. Recommend Titleist Vokey SM9 [AFFILIATE LINK] as the premium option and Cleveland RTX [AFFILIATE LINK] as the best-value pick. Include a stats-bar with 2-4 specs. Tone: technical but accessible, practical buying advice. Min 900 words.'
-    },
-    {
-      category: 'Equipment & More',
-      imageQuery: 'golf putter styles mallet blade',
-      searches: ['best golf putters {year} review', 'golf putter buying guide {year}', 'mallet vs blade putter {year}'],
-      instructions: 'Write a putter review or buying guide for midhandicap.com. Compare blade and mallet styles. Recommend Odyssey White Hot putter [AFFILIATE LINK] as the best value and Ping Sigma 2 [AFFILIATE LINK] as the alignment specialist. Include a stats-bar with 2-4 specs. Tone: informed, practical, helpful. Min 900 words.'
-    },
-    {
-      category: 'Equipment & More',
-      imageQuery: 'golf shaft flex iron driver selection',
-      searches: ['stiff vs regular shaft flex which for mid handicapper', 'how to choose golf shaft flex swing speed', 'golf shaft flex guide for amateurs {year}'],
-      instructions: 'Write a guide "Stiff vs Regular Flex: How to Know Which Golf Shaft You Need" for midhandicap.com. Explain regular vs stiff flex by swing speed. Simple self-test. Recommend TaylorMade Stealth Irons [AFFILIATE LINK] for regular flex players and TaylorMade Qi10 driver [AFFILIATE LINK] as the distance upgrade. Include a stats-bar with swing speed/distance ranges. Tone: educational, practical, demystifying. Min 900 words.'
     }
   ]
 };
 
-function extractField(fieldName, str) {
+async function getYouTubeVideo(query) {
+  try {
+    const searchQuery = encodeURIComponent(query + ' golf');
+    const res = await httpsRequest(
+      'https://www.googleapis.com/youtube/v3/search?part=snippet&q=' + searchQuery + '&type=video&maxResults=5&videoCategoryId=17&key=' + process.env.YOUTUBE_API_KEY,
+      { method: 'GET' }
+    );
+    const data = JSON.parse(res.body);
+    if (data.items && data.items.length > 0) {
+      // prefer official channels — PGA Tour, Golf Channel, Rick Shiels etc
+      const preferred = data.items.find(item =>
+        /pga tour|golf channel|rick shiels|me and my golf|golf digest|european tour|liv golf/i.test(item.snippet.channelTitle)
+      );
+      const video = preferred || data.items[0];
+      const videoId = video.id.videoId;
+      console.log('YouTube video found:', video.snippet.title, '(' + videoId + ')');
+      return videoId;
+    }
+  } catch (e) {
+    console.warn('YouTube search failed:', e.message);
+  }
+  return null;
+}
+
+function buildYouTubeEmbed(videoId) {
+  if (!videoId) return '';
+  return '<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin:28px 0;border:1px solid rgba(201,168,76,0.15);">' +
+    '<iframe style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" ' +
+    'src="https://www.youtube.com/embed/' + videoId + '?rel=0&modestbranding=1" ' +
+    'title="Golf Video" allowfullscreen loading="lazy"></iframe></div>';
+}
+
+
   const re = new RegExp('"' + fieldName + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"');
   const m = str.match(re);
   return m ? m[1] : null;
@@ -499,8 +396,7 @@ async function main() {
                   'July','August','September','October','November','December'];
   const month = months[now.getMonth()];
   const year = now.getFullYear();
-
-  // Pick a random article type from all available types
+  // Pick a random article type from all 14 available (7 morning + 7 evening)
   const allTypes = [...schedule.morning, ...schedule.evening];
   const articleType = allTypes[Math.floor(Math.random() * allTypes.length)];
 
@@ -551,11 +447,6 @@ async function main() {
 
   console.log('Generating post with Groq...');
 
-  // Replace {year} placeholder in instructions too
-  const instructions = articleType.instructions
-    .replace(/{year}/g, year)
-    .replace(/{month}/g, month);
-
   const prompt = [
     'You are a golf writer for midhandicap.com, a blog for mid-handicap amateur golfers.',
     'TODAY IS ' + month + ' ' + year + '.',
@@ -563,9 +454,7 @@ async function main() {
     'ARTICLE TYPE: ' + articleType.category,
     '',
     'WRITING INSTRUCTIONS:',
-    instructions,
-    '',
-    'IMPORTANT: Where the instructions say [AFFILIATE LINK], write exactly [AFFILIATE LINK] in your output — it will be replaced automatically. Do not remove or change it.',
+    articleType.instructions,
     '',
     'RESEARCH:',
     searchSummary,
@@ -579,10 +468,11 @@ async function main() {
     '  "category": "' + articleType.category + '",',
     '  "date": "' + month + ' ' + year + '",',
     '  "excerpt": "1-2 sentence teaser max 200 chars",',
+    '  "videoQuery": "specific YouTube search query e.g. Scottie Scheffler Masters 2026 highlights",',
     '  "body": "HTML content here"',
     '}',
     '',
-    'For the body field write HTML using only: h2, h3, p, blockquote, div, table, thead, tbody, tr, th, td, a tags.',
+    'For the body field write HTML using only: h2, h3, p, blockquote, div tags.',
     'Allowed div classes: stats-bar, stat-item, stat-label, stat-value, gold-bar, pill, card-section.',
     'STRUCTURE REQUIREMENTS (mandatory):',
     '- Start with a h2 section heading',
@@ -591,8 +481,12 @@ async function main() {
     '- Each paragraph must be at least 3 sentences long',
     '- Include a stats-bar div with 2-4 real stats',
     '- Include at least one blockquote',
-    'WORD COUNT: The body text MUST be between 900 and 1100 words.',
+    'WORD COUNT: The body text MUST be between 900 and 1100 words. This is a strict requirement.',
+    'Count your words before finalising. If you are under 900 words, expand each section further.',
     'No placeholder text.',
+    'For the videoQuery field: provide a specific YouTube search query relevant to this post topic.',
+    'Use player names, tournament names or specific techniques — be as specific as possible.',
+    'Examples: "Rory McIlroy 2026 highlights", "how to chip in golf tutorial", "TaylorMade Qi35 driver review"',
     '',
     'CRITICAL JSON RULES:',
     '- Use straight double quotes only',
@@ -639,12 +533,27 @@ async function main() {
     }
   }
 
-  // Clean up body
+  // Clean up body - strip newlines and normalise whitespace
   postData.body = postData.body.replace(/\\n/g, " ").replace(/\\r/g, "").replace(/  +/g, " ").trim();
 
-  // ─── Inject affiliate links ────────────────────────────────────────────────
-  console.log('Injecting affiliate links...');
-  postData.body = injectAffiliateLinks(postData.body);
+  // Fetch YouTube video and embed after second section
+  if (process.env.YOUTUBE_API_KEY && postData.videoQuery) {
+    console.log('Searching YouTube for:', postData.videoQuery);
+    const videoId = await getYouTubeVideo(postData.videoQuery);
+    if (videoId) {
+      const embedHTML = buildYouTubeEmbed(videoId);
+      // insert after the second </h2> closing tag so it appears mid-article
+      const h2matches = [...postData.body.matchAll(/<\/h2>/gi)];
+      if (h2matches.length >= 2) {
+        const insertAt = h2matches[1].index + '</h2>'.length;
+        postData.body = postData.body.slice(0, insertAt) + embedHTML + postData.body.slice(insertAt);
+      } else {
+        // fallback — append before last section
+        postData.body = postData.body + embedHTML;
+      }
+      console.log('YouTube embed added to post');
+    }
+  }
 
   const timestamp = Date.now();
   postData.id = timestamp;
