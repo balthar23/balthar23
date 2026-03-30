@@ -137,49 +137,45 @@ function injectAffiliateLinks(body) {
 
 // ─── Related Gear section ────────────────────────────────────────────────────
 // Appended to every post. Uses product card layout with images.
-// Images use Amazon's public CDN — no API key needed.
 const relatedGearByCategory = {
   'Tour News': [
-    { label: 'Titleist Pro V1 Golf Balls', img: 'https://m.media-amazon.com/images/I/71TR1BSSKEL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+Pro+V1+golf+balls` },
-    { label: 'TaylorMade Qi10 Driver', img: 'https://m.media-amazon.com/images/I/61bnGIS-URL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=TaylorMade+Qi10+driver` },
-    { label: 'Bushnell Pro X3 Rangefinder', img: 'https://m.media-amazon.com/images/I/71HXdPjEBzL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Bushnell+Pro+X3+rangefinder` },
-    { label: 'Garmin Approach S62 GPS Watch', img: 'https://m.media-amazon.com/images/I/61QHqe+GFPL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Garmin+Approach+S62+golf+watch` }
+    { label: 'Titleist Pro V1 Golf Balls', img: 'https://images.pexels.com/photos/1325681/pexels-photo-1325681.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+Pro+V1+golf+balls` },
+    { label: 'TaylorMade Qi10 Driver', img: 'https://images.pexels.com/photos/1174996/pexels-photo-1174996.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=TaylorMade+Qi10+driver` },
+    { label: 'Bushnell Pro X3 Rangefinder', img: 'https://images.pexels.com/photos/6542947/pexels-photo-6542947.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Bushnell+Pro+X3+rangefinder` },
+    { label: 'Garmin Approach S62 GPS Watch', img: 'https://images.pexels.com/photos/2735981/pexels-photo-2735981.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Garmin+Approach+S62+golf+watch` }
   ],
   'Player Focus': [
-    { label: 'Titleist Pro V1 Golf Balls', img: 'https://m.media-amazon.com/images/I/71TR1BSSKEL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+Pro+V1+golf+balls` },
-    { label: 'TaylorMade Qi10 Driver', img: 'https://m.media-amazon.com/images/I/61bnGIS-URL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=TaylorMade+Qi10+driver` },
-    { label: 'Callaway Paradym Driver', img: 'https://m.media-amazon.com/images/I/61CEZ5JJKLL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+Paradym+driver` },
-    { label: 'Garmin Approach S42 GPS Watch', img: 'https://m.media-amazon.com/images/I/61j3gBnMvvL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Garmin+Approach+S42+golf+watch` }
+    { label: 'Titleist Pro V1 Golf Balls', img: 'https://images.pexels.com/photos/1325681/pexels-photo-1325681.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+Pro+V1+golf+balls` },
+    { label: 'TaylorMade Qi10 Driver', img: 'https://images.pexels.com/photos/1174996/pexels-photo-1174996.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=TaylorMade+Qi10+driver` },
+    { label: 'Callaway Paradym Driver', img: 'https://images.pexels.com/photos/91228/pexels-photo-91228.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+Paradym+driver` },
+    { label: 'Garmin Approach S42 GPS Watch', img: 'https://images.pexels.com/photos/2735981/pexels-photo-2735981.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Garmin+Approach+S42+golf+watch` }
   ],
   'Instruction': [
-    { label: 'Golf Alignment Sticks', img: 'https://m.media-amazon.com/images/I/71RqkfXxTGL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+alignment+sticks` },
-    { label: 'Orange Whip Swing Trainer', img: 'https://m.media-amazon.com/images/I/61xJVB73vVL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Orange+Whip+golf+swing+trainer` },
-    { label: 'Golf Impact Bag Training Aid', img: 'https://m.media-amazon.com/images/I/71zYiGNKWHL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+impact+bag` },
-    { label: 'Golf Putting Mat', img: 'https://m.media-amazon.com/images/I/71N6oINEKCL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+putting+mat` }
+    { label: 'Golf Alignment Sticks', img: 'https://images.pexels.com/photos/1325681/pexels-photo-1325681.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+alignment+sticks` },
+    { label: 'Orange Whip Swing Trainer', img: 'https://images.pexels.com/photos/1174996/pexels-photo-1174996.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Orange+Whip+golf+swing+trainer` },
+    { label: 'Golf Impact Bag Training Aid', img: 'https://images.pexels.com/photos/91228/pexels-photo-91228.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+impact+bag` },
+    { label: 'Golf Putting Mat', img: 'https://images.pexels.com/photos/6542947/pexels-photo-6542947.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+putting+mat` }
   ],
   'Equipment & More': [
-    { label: 'TaylorMade Stealth Irons', img: 'https://m.media-amazon.com/images/I/61+qMYAqkNL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=TaylorMade+Stealth+irons` },
-    { label: 'Callaway Chrome Soft Golf Balls', img: 'https://m.media-amazon.com/images/I/71sN+hG0pdL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+Chrome+Soft+golf+balls` },
-    { label: 'Bushnell Pro X3 Rangefinder', img: 'https://m.media-amazon.com/images/I/71HXdPjEBzL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Bushnell+Pro+X3+rangefinder` },
-    { label: 'Titleist Vokey SM9 Wedge', img: 'https://m.media-amazon.com/images/I/41TqCKWnJLL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+Vokey+SM9+wedge` }
+    { label: 'TaylorMade Stealth Irons', img: 'https://images.pexels.com/photos/1174996/pexels-photo-1174996.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=TaylorMade+Stealth+irons` },
+    { label: 'Callaway Chrome Soft Golf Balls', img: 'https://images.pexels.com/photos/1325681/pexels-photo-1325681.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+Chrome+Soft+golf+balls` },
+    { label: 'Bushnell Pro X3 Rangefinder', img: 'https://images.pexels.com/photos/6542947/pexels-photo-6542947.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Bushnell+Pro+X3+rangefinder` },
+    { label: 'Titleist Vokey SM9 Wedge', img: 'https://images.pexels.com/photos/91228/pexels-photo-91228.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+Vokey+SM9+wedge` }
   ],
   'Course Guide': [
-    { label: 'Bushnell Pro X3 Rangefinder', img: 'https://m.media-amazon.com/images/I/71HXdPjEBzL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Bushnell+Pro+X3+rangefinder` },
-    { label: 'Titleist Pro V1 Golf Balls', img: 'https://m.media-amazon.com/images/I/71TR1BSSKEL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+Pro+V1+golf+balls` },
-    { label: 'Garmin Approach S62 GPS Watch', img: 'https://m.media-amazon.com/images/I/61QHqe+GFPL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Garmin+Approach+S62+golf+watch` },
-    { label: 'Callaway Golf Bag', img: 'https://m.media-amazon.com/images/I/71QC36RFJWL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+golf+bag` }
+    { label: 'Bushnell Pro X3 Rangefinder', img: 'https://images.pexels.com/photos/6542947/pexels-photo-6542947.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Bushnell+Pro+X3+rangefinder` },
+    { label: 'Titleist Pro V1 Golf Balls', img: 'https://images.pexels.com/photos/1325681/pexels-photo-1325681.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+Pro+V1+golf+balls` },
+    { label: 'Garmin Approach S62 GPS Watch', img: 'https://images.pexels.com/photos/2735981/pexels-photo-2735981.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Garmin+Approach+S62+golf+watch` },
+    { label: 'Callaway Golf Bag', img: 'https://images.pexels.com/photos/1174996/pexels-photo-1174996.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+golf+bag` }
   ]
 };
 
 const relatedGearDefault = [
-  { label: 'Golf Balls', img: 'https://m.media-amazon.com/images/I/71TR1BSSKEL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+balls+mid+handicap` },
-  { label: 'Golf Irons', img: 'https://m.media-amazon.com/images/I/61+qMYAqkNL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+irons+mid+handicap` },
-  { label: 'Golf Rangefinder', img: 'https://m.media-amazon.com/images/I/71HXdPjEBzL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+rangefinder` },
-  { label: 'Golf GPS Watch', img: 'https://m.media-amazon.com/images/I/61QHqe+GFPL._AC_SX300_.jpg', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+GPS+watch` }
+  { label: 'Golf Balls', img: 'https://images.pexels.com/photos/1325681/pexels-photo-1325681.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+balls+mid+handicap` },
+  { label: 'Golf Irons', img: 'https://images.pexels.com/photos/1174996/pexels-photo-1174996.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+irons+mid+handicap` },
+  { label: 'Golf Rangefinder', img: 'https://images.pexels.com/photos/6542947/pexels-photo-6542947.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+rangefinder` },
+  { label: 'Golf GPS Watch', img: 'https://images.pexels.com/photos/2735981/pexels-photo-2735981.jpeg?auto=compress&cs=tinysrgb&w=300&h=200&fit=crop', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+GPS+watch` }
 ];
-
-// Fallback placeholder if Amazon image fails to load
-const PLACEHOLDER = 'https://via.placeholder.com/300x300/0e1d35/c9a84c?text=Golf+Gear';
 
 function buildRelatedGearSection(category) {
   let products = relatedGearByCategory[category];
@@ -190,9 +186,10 @@ function buildRelatedGearSection(category) {
     products = key ? relatedGearByCategory[key] : relatedGearDefault;
   }
 
+  // onerror sets display:none to avoid flicker loop
   const cards = products.map(p =>
     `<a class="product-card" href="${p.url}" target="_blank" rel="noopener sponsored">` +
-    `<img src="${p.img}" alt="${p.label}" onerror="this.src='${PLACEHOLDER}'">` +
+    `<img src="${p.img}" alt="${p.label}" onerror="this.style.display='none'">` +
     `<div class="product-card-name">${p.label}</div>` +
     `<div class="product-card-btn">View on Amazon AU &rarr;</div>` +
     `</a>`
@@ -202,7 +199,6 @@ function buildRelatedGearSection(category) {
 
   return `<div class="related-gear-section"><h2>&#9971; Related Gear</h2><p>Gear worth checking out for mid-handicap golfers:</p><div class="related-gear-grid">${cards}</div></div>`;
 }
-
 function httpsRequest(url, options, body) {
   return new Promise((resolve, reject) => {
     const req = https.request(url, options, (res) => {
