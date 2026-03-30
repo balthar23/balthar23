@@ -1,0 +1,57 @@
+name: Generate Evening Golf Post
+
+on:
+  schedule:
+    - cron: '0 8 * * *'    # 6:00 PM Melbourne (AEDT)
+  workflow_dispatch:
+
+jobs:
+  generate-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate golf post
+        env:
+          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: node scripts/generate-post.js
+
+      - name: Publish and clean up
+        env:
+          FAIRWAY_API_KEY: ${{ secrets.FAIRWAY_API_KEY }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          POST_FILE=$(ls -t pending-posts/*.json 2>/dev/null | head -1)
+          if [ -z "$POST_FILE" ]; then
+            echo "No post file found"
+            exit 1
+          fi
+
+          echo "Publishing: $POST_FILE"
+          cat "$POST_FILE"
+
+          RESPONSE=$(curl -s -X POST https://midhandicap.com/api.php/posts \
+            -H "Content-Type: application/json" \
+            -H "X-API-Key: $FAIRWAY_API_KEY" \
+            -d @"$POST_FILE")
+
+          echo "API response: $RESPONSE"
+
+          if echo "$RESPONSE" | grep -q '"success":true'; then
+            echo "✅ Post published successfully"
+          else
+            echo "❌ Publish failed"
+            exit 1
+          fi
+
+          rm "$POST_FILE"
+          echo "🗑️ Cleaned up $POST_FILE"
