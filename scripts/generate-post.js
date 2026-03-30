@@ -385,6 +385,7 @@ function buildYouTubeEmbed(videoId) {
 }
 
 
+function extractField(fieldName, str) {
   const re = new RegExp('"' + fieldName + '"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"');
   const m = str.match(re);
   return m ? m[1] : null;
