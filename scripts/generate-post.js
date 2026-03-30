@@ -54,6 +54,35 @@ const productLibrary = [
   { keywords: ['impact bag', 'golf impact bag'], label: 'Golf Impact Bag Training Aid', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+impact+bag` },
   { keywords: ['swing trainer', 'golf swing trainer'], label: 'Golf Swing Trainer', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+swing+trainer` },
   { keywords: ['putting mat', 'golf putting mat'], label: 'Golf Putting Mat', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+putting+mat` },
+  // NEW DRIVER MODELS
+  { keywords: ['taylormade qi35', 'qi35 driver'], label: 'TaylorMade Qi35 Driver', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=TaylorMade+Qi35+driver` },
+  { keywords: ['callaway ai smoke', 'ai smoke driver'], label: 'Callaway Ai Smoke Driver', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+Ai+Smoke+driver` },
+  { keywords: ['cobra darkspeed', 'darkspeed driver'], label: 'Cobra Darkspeed Driver', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Cobra+Darkspeed+driver` },
+  // NEW IRON MODELS
+  { keywords: ['taylormade qi35 irons', 'qi35 irons'], label: 'TaylorMade Qi35 Irons', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=TaylorMade+Qi35+irons` },
+  { keywords: ['callaway ai smoke irons', 'ai smoke irons'], label: 'Callaway Ai Smoke Irons', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+Ai+Smoke+irons` },
+  { keywords: ['srixon zx7', 'srixon zx5', 'srixon irons'], label: 'Srixon ZX Irons', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Srixon+ZX+irons` },
+  // GOLF GLOVES
+  { keywords: ['footjoy glove', 'footjoy golf glove', 'footjoy contour'], label: 'FootJoy Golf Glove', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=FootJoy+golf+glove` },
+  { keywords: ['callaway golf glove', 'callaway glove'], label: 'Callaway Golf Glove', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+golf+glove` },
+  { keywords: ['titleist golf glove', 'titleist glove'], label: 'Titleist Golf Glove', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+golf+glove` },
+  // GOLF TROLLEYS / PUSHCARTS
+  { keywords: ['sun mountain trolley', 'sun mountain cart', 'sun mountain push cart'], label: 'Sun Mountain Push Cart', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Sun+Mountain+golf+push+cart` },
+  { keywords: ['clicgear trolley', 'clicgear cart', 'clicgear push cart'], label: 'Clicgear Golf Trolley', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Clicgear+golf+trolley` },
+  { keywords: ['electric trolley', 'electric golf trolley', 'motorised trolley'], label: 'Electric Golf Trolley', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=electric+golf+trolley` },
+  // GOLF BAGS
+  { keywords: ['titleist golf bag', 'titleist bag'], label: 'Titleist Golf Bag', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Titleist+golf+bag` },
+  { keywords: ['callaway golf bag', 'callaway stand bag'], label: 'Callaway Golf Bag', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Callaway+golf+bag` },
+  { keywords: ['ping golf bag', 'ping stand bag'], label: 'Ping Golf Bag', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Ping+golf+bag` },
+  // LAUNCH MONITORS
+  { keywords: ['flightscope mevo', 'mevo plus', 'mevo launch monitor'], label: 'FlightScope Mevo Launch Monitor', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=FlightScope+Mevo+launch+monitor` },
+  { keywords: ['garmin approach r10', 'approach r10'], label: 'Garmin Approach R10 Launch Monitor', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Garmin+Approach+R10+launch+monitor` },
+  // GOLF SUNGLASSES
+  { keywords: ['oakley golf sunglasses', 'oakley sunglasses'], label: 'Oakley Golf Sunglasses', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=Oakley+golf+sunglasses` },
+  // GOLF FITNESS
+  { keywords: ['golf fitness band', 'resistance band golf', 'golf resistance band'], label: 'Golf Fitness Resistance Bands', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+fitness+resistance+bands` },
+  // GOLF TOWELS & ACCESSORIES
+  { keywords: ['golf towel', 'microfibre golf towel'], label: 'Golf Towel', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+towel` },
   // GENERIC FALLBACKS
   { keywords: ['golf irons', 'set of irons', 'iron set'], label: 'Golf Irons on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+irons+mid+handicap` },
   { keywords: ['golf driver', 'new driver'], label: 'Golf Driver on Amazon AU', url: `https://www.amazon.com.au/s?tag=${AMAZON_TAG}&k=golf+driver` },
