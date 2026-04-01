@@ -1,23 +1,77 @@
 name: Auto Post to X
 
 on:
+  workflow_dispatch:      # manual trigger
   schedule:
-    - cron: "0 */12 * * *"   # Runs twice a day
-  workflow_dispatch:          # Allows manual run
+    - cron: "0 */12 * * *"
 
 jobs:
-  post_to_x:
+  tweet:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Create tweet text
-        id: text
-        run: |
-          echo "text=New post is live on my site! https://yourwebsite.com" >> $GITHUB_OUTPUT
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Send Tweet
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Create tweet script
         run: |
-          curl -X POST "https://api.x.com/2/tweets" \
-            -H "Authorization: Bearer ${{ secrets.X_BEARER_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d "{\"text\": \"${{ steps.text.outputs.text }}\"}"
+          cat > tweet.js << 'EOF'
+          const OAuth = require('oauth-1.0a');
+          const crypto = require('crypto');
+          const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
+          const oauth = OAuth({
+            consumer: {
+              key: process.env.X_API_KEY,
+              secret: process.env.X_API_SECRET,
+            },
+            signature_method: 'HMAC-SHA1',
+            hash_function(base, key) {
+              return crypto.createHmac('sha1', key).update(base).digest('base64');
+            },
+          });
+
+          const token = {
+            key: process.env.X_ACCESS_TOKEN,
+            secret: process.env.X_ACCESS_SECRET,
+          };
+
+          const url = "https://api.x.com/2/tweets";
+          const body = { text: "Automated test tweet from GitHub Actions ✅" };
+
+          const requestData = {
+            url,
+            method: "POST",
+            data: body,
+          };
+
+          fetch(url, {
+            method: "POST",
+            headers: {
+              ...oauth.toHeader(oauth.authorize(requestData, token)),
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          })
+            .then(res => res.text())
+            .then(text => {
+              console.log("Response:", text);
+            })
+            .catch(err => console.error("ERROR:", err));
+          EOF
+
+      - name: Install dependencies
+        run: npm install oauth-1.0a node-fetch@3
+
+      - name: Run tweet
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+        run: node tweet.js
