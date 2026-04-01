@@ -1,7 +1,7 @@
 name: Auto Post to X
 
 on:
-  workflow_dispatch:      # manual trigger
+  workflow_dispatch:
   schedule:
     - cron: "0 */12 * * *"
 
@@ -18,55 +18,32 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install Twitter Client
+        run: npm install twitter-api-v2
+
       - name: Create tweet script
         run: |
           cat > tweet.js << 'EOF'
-          const OAuth = require('oauth-1.0a');
-          const crypto = require('crypto');
-          const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+          const { TwitterApi } = require('twitter-api-v2');
 
-          const oauth = OAuth({
-            consumer: {
-              key: process.env.X_API_KEY,
-              secret: process.env.X_API_SECRET,
-            },
-            signature_method: 'HMAC-SHA1',
-            hash_function(base, key) {
-              return crypto.createHmac('sha1', key).update(base).digest('base64');
-            },
+          const client = new TwitterApi({
+            appKey: process.env.X_API_KEY,
+            appSecret: process.env.X_API_SECRET,
+            accessToken: process.env.X_ACCESS_TOKEN,
+            accessSecret: process.env.X_ACCESS_SECRET,
           });
 
-          const token = {
-            key: process.env.X_ACCESS_TOKEN,
-            secret: process.env.X_ACCESS_SECRET,
-          };
+          async function sendTweet() {
+            try {
+              const response = await client.v2.tweet("GitHub Actions test tweet ✅ This should finally work.");
+              console.log("SUCCESS:", response);
+            } catch (error) {
+              console.error("ERROR:", error);
+            }
+          }
 
-          const url = "https://api.x.com/2/tweets";
-          const body = { text: "Automated test tweet from GitHub Actions ✅" };
-
-          const requestData = {
-            url,
-            method: "POST",
-            data: body,
-          };
-
-          fetch(url, {
-            method: "POST",
-            headers: {
-              ...oauth.toHeader(oauth.authorize(requestData, token)),
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(body),
-          })
-            .then(res => res.text())
-            .then(text => {
-              console.log("Response:", text);
-            })
-            .catch(err => console.error("ERROR:", err));
+          sendTweet();
           EOF
-
-      - name: Install dependencies
-        run: npm install oauth-1.0a node-fetch@3
 
       - name: Run tweet
         env:
