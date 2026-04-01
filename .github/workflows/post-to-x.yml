@@ -3,24 +3,28 @@ name: Auto Post to X
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 */12 * * *"
+    - cron: "0 */12 * * *"   # Runs twice per day
 
 jobs:
   tweet:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout repo (required by Actions environment)
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Install Node.js
       - name: Install Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
+      # Install Twitter API client (OAuth 1.0a compatible)
       - name: Install Twitter Client
         run: npm install twitter-api-v2
 
+      # Create tweet script
       - name: Create tweet script
         run: |
           cat > tweet.js << 'EOF'
@@ -35,20 +39,34 @@ jobs:
 
           async function sendTweet() {
             try {
-              const response = await client.v2.tweet("GitHub Actions test tweet ✅ This should finally work.");
+              const response = await client.v2.tweet("GitHub Actions test tweet ✅");
               console.log("SUCCESS:", response);
+              return true;
             } catch (error) {
               console.error("ERROR:", error);
+              return false;
             }
           }
 
-          sendTweet();
+          async function runWithRetries(maxRetries = 5) {
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+              const ok = await sendTweet();
+              if (ok) return;
+              console.log(\`Retrying in \${attempt * 3} seconds...\`);
+              await new Promise(res => setTimeout(res, attempt * 3000));
+            }
+            console.error("FAILED after all retries");
+          }
+
+          runWithRetries();
           EOF
 
-      - name: Run tweet
+      # Run the script with retries
+      - name: Run tweet with retries
         env:
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
           X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
         run: node tweet.js
+``
