@@ -1,0 +1,23 @@
+name: Auto Post to X
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"   # Runs twice a day
+  workflow_dispatch:          # Allows manual run
+
+jobs:
+  post_to_x:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create tweet text
+        id: text
+        run: |
+          echo "text=New post is live on my site! https://yourwebsite.com" >> $GITHUB_OUTPUT
+
+      - name: Send Tweet
+        run: |
+          curl -X POST "https://api.x.com/2/tweets" \
+            -H "Authorization: Bearer ${{ secrets.X_BEARER_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"text\": \"${{ steps.text.outputs.text }}\"}"
