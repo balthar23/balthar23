@@ -2,7 +2,7 @@ name: Generate Daily Golf Post
 
 on:
   schedule:
-    - cron: '30 19 * * *'   # 7:00 AM Melbourne (AEDT)
+    - cron: '30 19 * * *'   # 06:30 AM Melbourne (AEDT)
   workflow_dispatch:
 
 jobs:
