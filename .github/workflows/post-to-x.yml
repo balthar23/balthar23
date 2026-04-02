@@ -39,7 +39,7 @@ jobs:
 
           async function sendTweet() {
             try {
-              const response = await client.v2.tweet("GitHub Actions test tweet ✅");
+              const response = await client.v2.tweet("GitHub Actions test tweet. ✅");
               console.log("SUCCESS:", response);
               return true;
             } catch (error) {
