@@ -1,25 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
+<rss version="2.0"
+     xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Midhandicap.com</title>
     <link>https://midhandicap.com</link>
     <description>Latest golf news and analysis</description>
     <language>en-au</language>
 
+    <!-- Canonical feed URL -->
+    <atom:link href="https://midhandicap.com/rss.xml"
+               rel="self"
+               type="application/rss+xml" />
+
     <item>
       <title>Cameron Young Wins The Players</title>
       <link>https://midhandicap.com/posts/cameron-young-players.html</link>
       <description>Young storms Sawgrass to claim his biggest PGA Tour title.</description>
-      <pubDate>Wed, 02 Apr 2026 00:00:00 GMT</pubDate>
-      <guid>https://midhandicap.com/posts/cameron-young-players.html</guid>
+      <pubDate>Thu, 02 Apr 2026 00:00:00 GMT</pubDate>
+      <guid isPermaLink="true">
+        https://midhandicap.com/posts/cameron-young-players.html
+      </guid>
     </item>
 
     <item>
       <title>Houston Open Preview: Who to Watch</title>
       <link>https://midhandicap.com/posts/houston-open-preview.html</link>
       <description>A look ahead to Memorial Park and the key contenders.</description>
-      <pubDate>Tue, 01 Apr 2026 12:00:00 GMT</pubDate>
-      <guid>https://midhandicap.com/posts/houston-open-preview.html</guid>
+      <pubDate>Wed, 01 Apr 2026 12:00:00 GMT</pubDate>
+      <guid isPermaLink="true">
+        https://midhandicap.com/posts/houston-open-preview.html
+      </guid>
     </item>
 
   </channel>
