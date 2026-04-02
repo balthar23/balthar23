@@ -1,1 +1,19 @@
 
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0">
+  <channel>
+    <title>Your Site Name</title>
+    <link>https://yourdomain.com</link>
+    <description>Latest updates from Your Site</description>
+    <language>en-au</language>
+
+    <item>
+      <title>Your Post Title</title>
+      <link>https://yourdomain.com/posts/your-post.html</link>
+      <description>A short summary of the post.</description>
+      <pubDate>Wed, 02 Apr 2026 00:00:00 GMT</pubDate>
+      <guid>https://yourdomain.com/posts/your-post.html</guid>
+    </item>
+
+  </channel>
+</rss>
